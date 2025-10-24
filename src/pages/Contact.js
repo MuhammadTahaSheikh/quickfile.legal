@@ -233,6 +233,12 @@ const Contact = () => {
                         '& .MuiInputLabel-root.Mui-focused': {
                           color: '#FFD700',
                         },
+                        '& .MuiInputBase-input': {
+                          color: '#1A2B47 !important',
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1A2B47 !important',
+                        },
                       }}
                     />
                   </Grid>
@@ -264,6 +270,12 @@ const Contact = () => {
                         '& .MuiInputLabel-root.Mui-focused': {
                           color: '#FFD700',
                         },
+                        '& .MuiInputBase-input': {
+                          color: '#1A2B47 !important',
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1A2B47 !important',
+                        },
                       }}
                     />
                   </Grid>
@@ -292,6 +304,12 @@ const Contact = () => {
                         },
                         '& .MuiInputLabel-root.Mui-focused': {
                           color: '#FFD700',
+                        },
+                        '& .MuiInputBase-input': {
+                          color: '#1A2B47 !important',
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1A2B47 !important',
                         },
                       }}
                     />
@@ -322,6 +340,12 @@ const Contact = () => {
                         },
                         '& .MuiInputLabel-root.Mui-focused': {
                           color: '#FFD700',
+                        },
+                        '& .MuiInputBase-input': {
+                          color: '#1A2B47 !important',
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1A2B47 !important',
                         },
                       }}
                     />
@@ -354,6 +378,12 @@ const Contact = () => {
                         },
                         '& .MuiInputLabel-root.Mui-focused': {
                           color: '#FFD700',
+                        },
+                        '& .MuiInputBase-input': {
+                          color: '#1A2B47 !important',
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1A2B47 !important',
                         },
                       }}
                     />

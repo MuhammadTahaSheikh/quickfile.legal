@@ -20,7 +20,6 @@ const Footer = () => {
         backgroundColor: '#1A2B47',
         py: 6,
         mt: 'auto',
-        color: '#FFFFFF',
       }}
     >
       <Container maxWidth="lg">
@@ -30,7 +29,7 @@ const Footer = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#FFFFFF' }}>
               Keep up on our always evolving product features and technology.
             </Typography>
-            <Typography variant="body2" sx={{ color: '#CCCCCC' }} paragraph>
+            <Typography variant="body2" paragraph sx={{ color: '#CCCCCC' }}>
               Enter your e-mail and subscribe to our newsletter.
             </Typography>
             <Box component="form" sx={{ display: 'flex', gap: 1, mb: 2 }}>
@@ -43,27 +42,28 @@ const Footer = () => {
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'white',
                     '& fieldset': {
-                      borderColor: '#ddd',
+                      borderColor: '#FFD700',
                     },
                     '&:hover fieldset': {
-                      borderColor: '#FFD700',
+                      borderColor: '#E6C200',
                     },
                     '&.Mui-focused fieldset': {
                       borderColor: '#FFD700',
                     },
                   },
-                }}
-              />
-              <Button 
-                variant="contained" 
-                sx={{
-                  backgroundColor: '#FFD700',
-                  color: '#1A2B47',
-                  '&:hover': {
-                    backgroundColor: '#E6C200',
+                  '& .MuiInputBase-input': {
+                    color: '#1A2B47 !important',
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    color: '#1A2B47 !important',
+                  },
+                  '& .MuiInputBase-input::placeholder': {
+                    color: '#666 !important',
+                    opacity: 1,
                   },
                 }}
-              >
+              />
+              <Button variant="contained" color="primary">
                 Sign up
               </Button>
             </Box>
@@ -91,7 +91,7 @@ const Footer = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <Divider sx={{ my: 2, backgroundColor: '#FFD700' }} />
+            <Divider sx={{ my: 2 }} />
           </Grid>
 
           {/* About Section */}
@@ -99,7 +99,7 @@ const Footer = () => {
             <Typography variant="h6" gutterBottom sx={{ color: '#FFFFFF' }}>
               About <Box component="span" sx={{ color: '#FFD700' }}>quickfile.legal</Box>
             </Typography>
-            <Typography variant="body2" sx={{ color: '#CCCCCC' }} paragraph>
+            <Typography variant="body2" paragraph sx={{ color: '#CCCCCC' }}>
               quickfile.legal is a unique, one of a kind service, that eFiles with the State E-Portal 
               and eServes your service list with the required service by email. With a few mouse clicks 
               your document is completely prepared, filed and served.
@@ -121,7 +121,7 @@ const Footer = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <Divider sx={{ my: 2, backgroundColor: '#FFD700' }} />
+            <Divider sx={{ my: 2 }} />
           </Grid>
 
           {/* Bottom Links */}
@@ -150,7 +150,7 @@ const Footer = () => {
 
           {/* Copyright */}
           <Grid item xs={12}>
-            <Typography variant="body2" sx={{ color: '#CCCCCC' }} align="center">
+            <Typography variant="body2" color="text.secondary" align="center">
               © Copyright - Legal Automation Systems, Inc.
             </Typography>
           </Grid>

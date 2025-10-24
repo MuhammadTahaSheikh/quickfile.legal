@@ -35,8 +35,8 @@ const Logo = ({ sx = {} }) => {
             width: '100%',
             height: '100%',
             borderRadius: 1.5,
-            backgroundColor: '#1976d2',
-            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.2)',
+            backgroundColor: '#1A2B47',
+            boxShadow: '0 2px 8px rgba(26, 43, 71, 0.3)',
           }}
         />
         
@@ -46,7 +46,7 @@ const Logo = ({ sx = {} }) => {
             position: 'relative',
             zIndex: 2,
             fontSize: { xs: '28px', sm: '32px', md: '36px' },
-            color: 'white',
+            color: '#FFD700',
           }}
         />
         
@@ -59,17 +59,18 @@ const Logo = ({ sx = {} }) => {
             zIndex: 3,
             width: { xs: '14px', sm: '16px', md: '18px' },
             height: { xs: '14px', sm: '16px', md: '18px' },
-            backgroundColor: '#4caf50',
+            backgroundColor: '#FFD700',
             borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            border: '1px solid #1A2B47',
           }}
         >
           <CheckCircle
             sx={{
               fontSize: { xs: '10px', sm: '12px', md: '14px' },
-              color: 'white',
+              color: '#1A2B47',
             }}
           />
         </Box>
@@ -86,9 +87,12 @@ const Logo = ({ sx = {} }) => {
             color: 'inherit',
             letterSpacing: '-0.01em',
             fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+            '& .quickfile-text': {
+              color: 'inherit',
+            }
           }}
         >
-          quickfile
+          <Box component="span" className="quickfile-text">quickfile</Box>
         </Typography>
         <Typography
           variant="h6"
@@ -101,9 +105,12 @@ const Logo = ({ sx = {} }) => {
             opacity: 0.8,
             letterSpacing: '0.02em',
             fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+            '& .legal-text': {
+              color: 'inherit',
+            }
           }}
         >
-          .legal
+          <Box component="span" className="legal-text">.legal</Box>
         </Typography>
       </Box>
     </Box>
