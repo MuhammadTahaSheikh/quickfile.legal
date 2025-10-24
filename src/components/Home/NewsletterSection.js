@@ -108,6 +108,21 @@ const NewsletterSection = () => {
                   '&.Mui-focused fieldset': {
                     borderColor: '#FFD700',
                   },
+                  '& input': {
+                    color: '#1A2B47 !important',
+                  },
+                },
+                '& .MuiInputBase-input': {
+                  color: '#1A2B47 !important',
+                },
+                '& .MuiOutlinedInput-input': {
+                  color: '#1A2B47 !important',
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#1A2B47',
+                },
+                '& .MuiInputLabel-root.Mui-focused': {
+                  color: '#FFD700',
                 },
               }}
               InputProps={{
