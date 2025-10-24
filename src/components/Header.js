@@ -109,7 +109,7 @@ const Header = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ backgroundColor: '#1976d2', zIndex: 1300 }}>
+      <AppBar position="fixed" sx={{ backgroundColor: '#1A2B47', zIndex: 1300 }}>
         <Toolbar>
           <Box
             component={Link}

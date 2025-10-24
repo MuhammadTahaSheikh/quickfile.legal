@@ -27,10 +27,7 @@ const NewsletterSection = () => {
   return (
     <Box
       sx={{
-        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("https://images.unsplash.com/photo-1521737711867-e3b97375f902?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80")',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
+        backgroundColor: '#1A2B47',
         py: 12,
         position: 'relative',
       }}
@@ -39,9 +36,9 @@ const NewsletterSection = () => {
         <Paper
           sx={{
             p: 6,
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backgroundColor: '#FFFFFF',
             borderRadius: 3,
-            backdropFilter: 'blur(10px)',
+            border: '2px solid #FFD700',
             textAlign: 'center',
           }}
         >
@@ -50,7 +47,7 @@ const NewsletterSection = () => {
             component="h2"
             sx={{
               fontWeight: 'bold',
-              color: '#333',
+              color: '#1A2B47',
               mb: 3,
               fontSize: { xs: '1.8rem', md: '2.2rem' },
             }}
@@ -72,7 +69,7 @@ const NewsletterSection = () => {
           <Typography
             variant="h5"
             sx={{
-              color: '#333',
+              color: '#1A2B47',
               fontWeight: 'bold',
               mb: 4,
               fontSize: '1.2rem',
@@ -106,10 +103,10 @@ const NewsletterSection = () => {
                     borderColor: '#ddd',
                   },
                   '&:hover fieldset': {
-                    borderColor: '#1976d2',
+                    borderColor: '#FFD700',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: '#1976d2',
+                    borderColor: '#FFD700',
                   },
                 },
               }}
@@ -123,8 +120,8 @@ const NewsletterSection = () => {
               variant="contained"
               size="large"
               sx={{
-                backgroundColor: '#1976d2',
-                color: 'white',
+                backgroundColor: '#FFD700',
+                color: '#1A2B47',
                 px: 4,
                 py: 1.5,
                 fontSize: '1rem',
@@ -132,7 +129,7 @@ const NewsletterSection = () => {
                 borderRadius: 2,
                 minWidth: { xs: '100%', sm: 'auto' },
                 '&:hover': {
-                  backgroundColor: '#1565c0',
+                  backgroundColor: '#E6C200',
                 },
               }}
             >

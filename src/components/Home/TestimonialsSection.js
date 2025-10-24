@@ -35,7 +35,7 @@ const TestimonialsSection = () => {
   ];
 
   return (
-    <Box sx={{ backgroundColor: 'white', py: 8 }}>
+    <Box sx={{ backgroundColor: '#1A2B47', py: 8 }}>
       <Container maxWidth="lg">
         <Typography
           variant="h3"
@@ -43,7 +43,7 @@ const TestimonialsSection = () => {
           sx={{
             textAlign: 'center',
             fontWeight: 'bold',
-            color: '#333',
+            color: '#FFFFFF',
             mb: 6,
             fontSize: { xs: '2rem', md: '2.5rem' },
           }}
@@ -59,11 +59,13 @@ const TestimonialsSection = () => {
                   p: 4,
                   height: '100%',
                   borderRadius: 3,
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #FFD700',
+                  boxShadow: '0 4px 20px rgba(255, 215, 0, 0.1)',
                   transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
                   '&:hover': {
                     transform: 'translateY(-5px)',
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                    boxShadow: '0 8px 30px rgba(255, 215, 0, 0.2)',
                   },
                   position: 'relative',
                 }}
@@ -74,7 +76,7 @@ const TestimonialsSection = () => {
                     position: 'absolute',
                     top: 20,
                     right: 20,
-                    color: '#e3f2fd',
+                    color: '#FFD700',
                     fontSize: 40,
                   }}
                 >
@@ -87,7 +89,7 @@ const TestimonialsSection = () => {
                     value={testimonial.rating}
                     readOnly
                     size="small"
-                    sx={{ color: '#ffc107' }}
+                    sx={{ color: '#FFD700' }}
                   />
                 </Box>
 
@@ -95,7 +97,7 @@ const TestimonialsSection = () => {
                 <Typography
                   variant="body1"
                   sx={{
-                    color: '#333',
+                    color: '#1A2B47',
                     lineHeight: 1.6,
                     mb: 3,
                     fontStyle: 'italic',
@@ -105,7 +107,7 @@ const TestimonialsSection = () => {
                   "{testimonial.text}"
                 </Typography>
 
-                <Divider sx={{ my: 3, backgroundColor: '#f0f0f0' }} />
+                <Divider sx={{ my: 3, backgroundColor: '#FFD700' }} />
 
                 {/* Author Info */}
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -116,7 +118,7 @@ const TestimonialsSection = () => {
                       width: 60,
                       height: 60,
                       mr: 2,
-                      border: '3px solid #e3f2fd',
+                      border: '3px solid #FFD700',
                     }}
                   />
                   <Box>
@@ -124,7 +126,7 @@ const TestimonialsSection = () => {
                       variant="h6"
                       sx={{
                         fontWeight: 'bold',
-                        color: '#333',
+                        color: '#1A2B47',
                         fontSize: '1rem',
                       }}
                     >
@@ -153,15 +155,15 @@ const TestimonialsSection = () => {
           <Paper
             sx={{
               p: 6,
-              backgroundColor: '#f8f9fa',
+              backgroundColor: '#FFFFFF',
               borderRadius: 3,
-              border: '2px solid #e3f2fd',
+              border: '2px solid #FFD700',
             }}
           >
             <Typography
               variant="h4"
               sx={{
-                color: '#333',
+                color: '#1A2B47',
                 mb: 3,
                 fontWeight: 'bold',
               }}
@@ -187,11 +189,11 @@ const TestimonialsSection = () => {
               <Typography
                 variant="h5"
                 sx={{
-                  color: '#1976d2',
+                  color: '#FFD700',
                   fontWeight: 'bold',
                 }}
               >
-                Try quickfile.legal and get 2 Weeks Free
+                Try <Box component="span" sx={{ color: '#1A2B47' }}>quickfile.legal</Box> and get 2 Weeks <Box component="span" sx={{ color: '#FFD700' }}>FREE</Box>
               </Typography>
             </Box>
           </Paper>

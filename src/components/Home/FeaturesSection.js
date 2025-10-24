@@ -23,54 +23,54 @@ import {
 const FeaturesSection = () => {
   const features = [
     {
-      icon: <Speed sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <Speed sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'LIGHTNING-FAST EFILING',
       description: 'File documents with state e-portals in seconds, not hours. Our streamlined process eliminates the complexity of traditional eFiling systems and gets your documents submitted instantly.',
     },
     {
-      icon: <Gavel sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <Gavel sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'STATE COURT INTEGRATION',
       description: 'Direct integration with official state court eFiling systems. Currently supporting California, Florida, Texas, Pennsylvania, Georgia, Illinois, Indiana, Maryland, Michigan, North Carolina, and Arizona.',
     },
     {
-      icon: <CloudUpload sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <CloudUpload sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'SIMPLE DOCUMENT UPLOAD',
       description: 'Just drag and drop your legal documents. Our system automatically detects document types, applies proper formatting, and prepares them for court submission without any manual intervention.',
     },
     {
-      icon: <Email sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <Email sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'AUTOMATIC E-SERVICE',
       description: 'Once your document is filed, we automatically e-serve all parties on your service list via email. No more manual service requirements or missed deadlines.',
     },
     {
-      icon: <CheckCircle sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <CheckCircle sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'REAL-TIME STATUS TRACKING',
       description: 'Track your filing status in real-time. Get instant notifications when documents are accepted, rejected, or require corrections. Never wonder about your filing status again.',
     },
     {
-      icon: <Security sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <Security sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'SECURE & COMPLIANT',
       description: 'Bank-level security protects your sensitive legal documents. Full compliance with state court requirements and attorney-client privilege standards.',
     },
     {
-      icon: <Public sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <Public sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'MULTI-STATE SUPPORT',
       description: 'File in multiple states from one platform. Whether you practice in Florida, California, or Texas, quickfile.legal handles the state-specific requirements automatically.',
     },
     {
-      icon: <AttachMoney sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <AttachMoney sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'COST-EFFECTIVE SOLUTION',
       description: 'Save thousands on filing fees and administrative costs. Our competitive pricing and efficient process reduce your overhead while increasing your productivity.',
     },
     {
-      icon: <Support sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <Support sx={{ fontSize: 40, color: '#FFD700' }} />,
       title: 'DEDICATED SUPPORT',
       description: 'Get help when you need it. Our legal technology experts are available to assist with any filing questions or technical issues. We understand the legal process.',
     },
   ];
 
   return (
-    <Box sx={{ backgroundColor: 'white', py: 8 }}>
+    <Box sx={{ backgroundColor: '#1A2B47', py: 8 }}>
       <Container maxWidth="lg">
         <Typography
           variant="h3"
@@ -78,18 +78,18 @@ const FeaturesSection = () => {
           sx={{
             textAlign: 'center',
             fontWeight: 'bold',
-            color: '#1976d2',
+            color: '#FFFFFF',
             mb: 2,
             fontSize: { xs: '2rem', md: '2.5rem' },
           }}
         >
-          WHY CHOOSE QUICKFILE.LEGAL?
+          WHY CHOOSE <Box component="span" sx={{ color: '#FFD700' }}>QUICKFILE.LEGAL</Box>?
         </Typography>
         <Typography
           variant="h6"
           sx={{
             textAlign: 'center',
-            color: '#666',
+            color: '#CCCCCC',
             mb: 6,
             maxWidth: '600px',
             mx: 'auto',
@@ -107,12 +107,13 @@ const FeaturesSection = () => {
                 sx={{
                   height: '100%',
                   boxShadow: 'none',
-                  border: '1px solid #f0f0f0',
+                  border: '1px solid #FFD700',
                   borderRadius: 2,
+                  backgroundColor: '#FFFFFF',
                   transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
                   '&:hover': {
                     transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                    boxShadow: '0 4px 20px rgba(255, 215, 0, 0.3)',
                   },
                 }}
               >
@@ -121,7 +122,7 @@ const FeaturesSection = () => {
                     sx={{
                       width: 80,
                       height: 80,
-                      backgroundColor: '#e3f2fd',
+                      backgroundColor: '#1A2B47',
                       mx: 'auto',
                       mb: 3,
                     }}
@@ -133,7 +134,7 @@ const FeaturesSection = () => {
                     variant="h6"
                     sx={{
                       fontWeight: 'bold',
-                      color: '#333',
+                      color: '#1A2B47',
                       mb: 2,
                       fontSize: '1.1rem',
                     }}

@@ -28,7 +28,7 @@ const FAQ = () => {
   const faqCategories = [
     {
       title: 'Getting Started',
-      icon: <Help sx={{ color: '#1976d2' }} />,
+      icon: <Help sx={{ color: '#FFD700' }} />,
       questions: [
         {
           question: 'How do I get started with quickfile.legal?',
@@ -50,7 +50,7 @@ const FAQ = () => {
     },
     {
       title: 'Features & Functionality',
-      icon: <QuestionAnswer sx={{ color: '#1976d2' }} />,
+      icon: <QuestionAnswer sx={{ color: '#FFD700' }} />,
       questions: [
         {
           question: 'What is batch processing?',
@@ -76,7 +76,7 @@ const FAQ = () => {
     },
     {
       title: 'Technical Support',
-      icon: <Support sx={{ color: '#1976d2' }} />,
+      icon: <Support sx={{ color: '#FFD700' }} />,
       questions: [
         {
           question: 'What if I encounter technical issues?',
@@ -98,7 +98,7 @@ const FAQ = () => {
     },
     {
       title: 'Billing & Subscription',
-      icon: <Help sx={{ color: '#1976d2' }} />,
+      icon: <Help sx={{ color: '#FFD700' }} />,
       questions: [
         {
           question: 'What are the pricing options?',
@@ -141,18 +141,21 @@ const FAQ = () => {
       {/* Hero Section */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+          backgroundColor: '#1A2B47',
           color: 'white',
           py: 8,
           textAlign: 'center',
+          '& .MuiTypography-root': {
+            color: '#FFFFFF !important'
+          }
         }}
       >
         <Container maxWidth="lg">
-          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
+          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#FFFFFF !important' }}>
             Frequently Asked Questions
           </Typography>
-          <Typography variant="h6" sx={{ maxWidth: '600px', mx: 'auto' }}>
-            Find answers to common questions about quickfile.legal and how it can streamline your eFiling process.
+          <Typography variant="h6" sx={{ maxWidth: '600px', mx: 'auto', color: '#FFFFFF !important' }}>
+            Find answers to common questions about <Box component="span" sx={{ color: '#FFD700 !important', fontWeight: 'bold' }}>quickfile.legal</Box> and how it can streamline your eFiling process.
           </Typography>
         </Container>
       </Box>
@@ -168,17 +171,46 @@ const FAQ = () => {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <Search />
+                  <Search sx={{ color: '#FFD700' }} />
                 </InputAdornment>
               ),
             }}
-            sx={{ maxWidth: 600, mx: 'auto', display: 'block' }}
+            sx={{ 
+              maxWidth: 600, 
+              mx: 'auto', 
+              display: 'block',
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'white',
+                color: '#1A2B47',
+                '& fieldset': {
+                  borderColor: '#ddd',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#FFD700',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#FFD700',
+                },
+                '& input': {
+                  color: '#1A2B47 !important',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#1A2B47',
+              },
+              '& .MuiInputLabel-root.Mui-focused': {
+                color: '#FFD700',
+              },
+              '& .MuiInputBase-input': {
+                color: '#1A2B47 !important',
+              },
+            }}
           />
         </Box>
 
         {/* Popular Questions */}
         <Box sx={{ mb: 6 }}>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center', color: '#1A2B47' }}>
             Popular Questions
           </Typography>
           <Grid container spacing={2} sx={{ mt: 2 }}>
@@ -186,15 +218,20 @@ const FAQ = () => {
               <Grid item xs={12} sm={6} md={4} key={index}>
                 <Card 
                   sx={{ 
-                    cursor: 'pointer', 
+                    cursor: 'pointer',
+                    backgroundColor: '#FFFFFF',
+                    border: '1px solid #FFD700',
                     '&:hover': { 
-                      backgroundColor: '#f5f5f5' 
-                    } 
+                      backgroundColor: '#f5f5f5',
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 4px 20px rgba(255, 215, 0, 0.3)',
+                    },
+                    transition: 'all 0.2s ease-in-out',
                   }}
                   onClick={() => setSearchTerm(question)}
                 >
                   <CardContent>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', color: '#1A2B47 !important' }}>
                       {question}
                     </Typography>
                   </CardContent>
@@ -204,29 +241,71 @@ const FAQ = () => {
           </Grid>
         </Box>
 
+        {/* Search Results Indicator */}
+        {searchTerm && (
+          <Box sx={{ mb: 4, textAlign: 'center' }}>
+            <Typography variant="h6" sx={{ color: '#1A2B47 !important' }}>
+              Search results for: <Box component="span" sx={{ color: '#FFD700', fontWeight: 'bold' }}>"{searchTerm}"</Box>
+            </Typography>
+            <Typography 
+              variant="body2" 
+              sx={{ 
+                color: '#1A2B47 !important', 
+                cursor: 'pointer', 
+                textDecoration: 'underline',
+                mt: 1,
+                '&:hover': {
+                  color: '#FFD700 !important'
+                }
+              }}
+              onClick={() => setSearchTerm('')}
+            >
+              Clear search
+            </Typography>
+          </Box>
+        )}
+
         {/* FAQ Categories */}
         {filteredCategories.map((category, categoryIndex) => (
           <Box key={categoryIndex} sx={{ mb: 6 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
               {category.icon}
-              <Typography variant="h4" sx={{ fontWeight: 'bold', ml: 2 }}>
+              <Typography variant="h4" sx={{ fontWeight: 'bold', ml: 2, color: '#1A2B47' }}>
                 {category.title}
               </Typography>
             </Box>
             
             {category.questions.map((faq, faqIndex) => (
-              <Accordion key={faqIndex} sx={{ mb: 1 }}>
+              <Accordion key={faqIndex} sx={{ 
+                mb: 1,
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #FFD700',
+                '&:before': {
+                  display: 'none',
+                },
+                '&.Mui-expanded': {
+                  margin: '0 0 8px 0',
+                },
+              }}>
                 <AccordionSummary
-                  expandIcon={<ExpandMore />}
+                  expandIcon={<ExpandMore sx={{ color: '#FFD700' }} />}
                   aria-controls={`panel${categoryIndex}-${faqIndex}-content`}
                   id={`panel${categoryIndex}-${faqIndex}-header`}
+                  sx={{
+                    '& .MuiAccordionSummary-content': {
+                      margin: '12px 0',
+                    },
+                    '&:hover': {
+                      backgroundColor: '#f5f5f5',
+                    },
+                  }}
                 >
-                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1A2B47 !important' }}>
                     {faq.question}
                   </Typography>
                 </AccordionSummary>
-                <AccordionDetails>
-                  <Typography variant="body1" color="text.secondary">
+                <AccordionDetails sx={{ backgroundColor: '#FFFFFF' }}>
+                  <Typography variant="body1" sx={{ color: '#1A2B47 !important', lineHeight: 1.6 }}>
                     {faq.answer}
                   </Typography>
                 </AccordionDetails>
@@ -237,11 +316,11 @@ const FAQ = () => {
 
         {/* No Results */}
         {searchTerm && filteredCategories.length === 0 && (
-          <Paper sx={{ p: 4, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: 4, textAlign: 'center', backgroundColor: '#FFFFFF', border: '1px solid #FFD700' }}>
+            <Typography variant="h6" gutterBottom sx={{ color: '#1A2B47 !important' }}>
               No results found for "{searchTerm}"
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>
               Try searching with different keywords or browse our categories above.
             </Typography>
           </Paper>
@@ -249,25 +328,41 @@ const FAQ = () => {
 
         {/* Contact Support */}
         <Box sx={{ mt: 8, textAlign: 'center' }}>
-          <Paper sx={{ p: 4, backgroundColor: '#f8f9fa' }}>
-            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+          <Paper sx={{ p: 4, backgroundColor: '#FFFFFF', border: '1px solid #FFD700' }}>
+            <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#1A2B47 !important' }}>
               Still Have Questions?
             </Typography>
-            <Typography variant="body1" paragraph>
+            <Typography variant="body1" paragraph sx={{ color: '#1A2B47 !important' }}>
               Can't find what you're looking for? Our support team is here to help!
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, flexWrap: 'wrap' }}>
               <Chip
                 label="Call: (833) 657-4812"
-                color="primary"
                 variant="outlined"
-                sx={{ fontSize: '1rem', py: 2 }}
+                sx={{ 
+                  fontSize: '1rem', 
+                  py: 2,
+                  borderColor: '#FFD700',
+                  color: '#1A2B47',
+                  '&:hover': {
+                    backgroundColor: '#FFD700',
+                    color: '#1A2B47',
+                  }
+                }}
               />
               <Chip
                 label="Email: sales@quickfile.legal.com"
-                color="primary"
                 variant="outlined"
-                sx={{ fontSize: '1rem', py: 2 }}
+                sx={{ 
+                  fontSize: '1rem', 
+                  py: 2,
+                  borderColor: '#FFD700',
+                  color: '#1A2B47',
+                  '&:hover': {
+                    backgroundColor: '#FFD700',
+                    color: '#1A2B47',
+                  }
+                }}
               />
             </Box>
           </Paper>

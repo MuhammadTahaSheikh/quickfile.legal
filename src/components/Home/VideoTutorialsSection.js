@@ -43,7 +43,7 @@ const VideoTutorialsSection = () => {
   };
 
   return (
-    <Box sx={{ backgroundColor: '#f8f9fa', py: 8 }}>
+    <Box sx={{ backgroundColor: '#1A2B47', py: 8 }}>
       <Container maxWidth="lg">
         <Typography
           variant="h3"
@@ -51,12 +51,12 @@ const VideoTutorialsSection = () => {
           sx={{
             textAlign: 'center',
             fontWeight: 'bold',
-            color: '#333',
+            color: '#FFFFFF',
             mb: 6,
             fontSize: { xs: '2rem', md: '2.5rem' },
           }}
         >
-          quickfile.legal in Action
+          <Box component="span" sx={{ color: '#FFD700' }}>quickfile.legal</Box> in Action
         </Typography>
 
         <Grid container spacing={4}>
@@ -67,11 +67,13 @@ const VideoTutorialsSection = () => {
                   height: '100%',
                   borderRadius: 3,
                   overflow: 'hidden',
-                  boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                  backgroundColor: '#FFFFFF',
+                  border: '1px solid #FFD700',
+                  boxShadow: '0 4px 20px rgba(255, 215, 0, 0.1)',
                   transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
                   '&:hover': {
                     transform: 'translateY(-5px)',
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.15)',
+                    boxShadow: '0 8px 30px rgba(255, 215, 0, 0.2)',
                   },
                 }}
               >
@@ -101,14 +103,14 @@ const VideoTutorialsSection = () => {
                     sx={{
                       position: 'relative',
                       zIndex: 1,
-                      backgroundColor: 'rgba(25, 118, 210, 0.9)',
-                      color: 'white',
+                      backgroundColor: 'rgba(255, 215, 0, 0.9)',
+                      color: '#1A2B47',
                       borderRadius: '50%',
                       width: 80,
                       height: 80,
                       minWidth: 80,
                       '&:hover': {
-                        backgroundColor: 'rgba(25, 118, 210, 1)',
+                        backgroundColor: 'rgba(255, 215, 0, 1)',
                         transform: 'scale(1.1)',
                       },
                       transition: 'all 0.3s ease-in-out',
@@ -124,7 +126,7 @@ const VideoTutorialsSection = () => {
                     component="h3"
                     sx={{
                       fontWeight: 'bold',
-                      color: '#333',
+                      color: '#1A2B47',
                       mb: 2,
                       fontSize: '1.3rem',
                     }}
@@ -152,12 +154,12 @@ const VideoTutorialsSection = () => {
           <Typography
             variant="h5"
             sx={{
-              color: '#333',
+              color: '#FFFFFF',
               mb: 3,
               fontWeight: 'bold',
             }}
           >
-            Ready to see quickfile.legal in action?
+            Ready to see <Box component="span" sx={{ color: '#FFD700' }}>quickfile.legal</Box> in action?
           </Typography>
           
           <Button
@@ -165,15 +167,15 @@ const VideoTutorialsSection = () => {
             size="large"
             onClick={handleStartTrial}
             sx={{
-              backgroundColor: '#1976d2',
-              color: 'white',
+              backgroundColor: '#FFD700',
+              color: '#1A2B47',
               px: 6,
               py: 2,
               fontSize: '1.1rem',
               fontWeight: 'bold',
               borderRadius: 3,
               '&:hover': {
-                backgroundColor: '#1565c0',
+                backgroundColor: '#E6C200',
               },
             }}
           >

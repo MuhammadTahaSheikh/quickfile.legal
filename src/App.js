@@ -17,7 +17,13 @@ import Dashboard from './pages/Dashboard';
 function App() {
   return (
     <AuthProvider>
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <Box sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        minHeight: '100vh',
+        backgroundColor: '#1A2B47',
+        color: '#FFFFFF'
+      }}>
         <ScrollToTop />
         <Header />
         <Box component="main" sx={{ flexGrow: 1, pt: 8 }}>

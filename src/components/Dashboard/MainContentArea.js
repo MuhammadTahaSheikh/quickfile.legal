@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react';
 import {
   Box,
   Typography,
@@ -24,14 +24,23 @@ import {
   Warning,
   Delete,
 } from '@mui/icons-material';
+import EFileModal from './EFileModal';
+import ExhibitCreatorModal from './ExhibitCreatorModal';
 
-const MainContentArea = () => {
+const MainContentArea = forwardRef((props, ref) => {
   const fileInputRef = useRef(null);
   const [processQueue, setProcessQueue] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
   const [nextId, setNextId] = useState(1);
+  const [efileModalOpen, setEfileModalOpen] = useState(false);
+  const [exhibitCreatorOpen, setExhibitCreatorOpen] = useState(false);
+
+  // Expose methods to parent component
+  useImperativeHandle(ref, () => ({
+    handleEFileClick,
+  }));
 
   // File handling functions
   const formatFileSize = (bytes) => {
@@ -62,7 +71,7 @@ const MainContentArea = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileSelect = (event) => {
+  const handleFileInputChange = (event) => {
     const files = Array.from(event.target.files);
     if (files.length === 0) return;
 
@@ -121,6 +130,46 @@ const MainContentArea = () => {
     setSnackbar(prev => ({ ...prev, open: false }));
   };
 
+  const handleFileSelect = (file) => {
+    setSelectedFile(file);
+  };
+
+  const handleEFileClick = () => {
+    if (selectedFile) {
+      setEfileModalOpen(true);
+    } else {
+      setSnackbar({
+        open: true,
+        message: 'Please select a file from the process queue first',
+        severity: 'warning'
+      });
+    }
+  };
+
+  const handleNewComplaint = (file) => {
+    console.log('New Complaint for file:', file);
+    setEfileModalOpen(false); // Close the E-File modal
+    setExhibitCreatorOpen(true); // Open the Exhibit Creator modal
+  };
+
+  const handleExistingCase = (file) => {
+    console.log('Existing Case for file:', file);
+    setSnackbar({
+      open: true,
+      message: `Opening existing case for ${file.name}`,
+      severity: 'success'
+    });
+  };
+
+  const handleBatchExisting = (file) => {
+    console.log('Batch Existing for file:', file);
+    setSnackbar({
+      open: true,
+      message: `Starting batch existing for ${file.name}`,
+      severity: 'success'
+    });
+  };
+
   const getStatusIcon = (status) => {
     switch (status) {
       case 'Ready to File':
@@ -162,7 +211,7 @@ const MainContentArea = () => {
       <input
         type="file"
         ref={fileInputRef}
-        onChange={handleFileSelect}
+        onChange={handleFileInputChange}
         multiple
         accept=".pdf,.doc,.docx,.txt,.rtf,.jpg,.jpeg,.png,.gif"
         style={{ display: 'none' }}
@@ -197,11 +246,17 @@ const MainContentArea = () => {
               {processQueue.map((item, index) => (
                 <React.Fragment key={item.id}>
                   <ListItem
+                    onClick={() => handleFileSelect(item)}
                     sx={{
                       py: 1.5,
                       px: 2,
+                      cursor: 'pointer',
+                      backgroundColor: selectedFile?.id === item.id ? '#e3f2fd' : 'transparent',
+                      border: selectedFile?.id === item.id ? '2px solid #1976d2' : '2px solid transparent',
+                      borderRadius: '8px',
+                      mb: 1,
                       '&:hover': {
-                        backgroundColor: '#f5f5f5',
+                        backgroundColor: selectedFile?.id === item.id ? '#e3f2fd' : '#f5f5f5',
                       },
                     }}
                   >
@@ -447,6 +502,38 @@ const MainContentArea = () => {
           >
             View File
           </Button>
+          
+          <Button
+            variant="contained"
+            startIcon={<CloudUpload />}
+            onClick={handleEFileClick}
+            disabled={!selectedFile}
+            size="large"
+            sx={{
+              textTransform: 'none',
+              fontSize: '16px',
+              fontWeight: '600',
+              px: 4,
+              py: 1.5,
+              minWidth: '140px',
+              height: '48px',
+              backgroundColor: '#ff9800',
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(255, 152, 0, 0.3)',
+              '&:hover': {
+                backgroundColor: '#f57c00',
+                boxShadow: '0 4px 8px rgba(255, 152, 0, 0.4)',
+                transform: 'translateY(-1px)',
+              },
+              '&:disabled': {
+                backgroundColor: '#ccc',
+                boxShadow: 'none',
+                transform: 'none',
+              },
+            }}
+          >
+            E-File
+          </Button>
         </Box>
       </Box>
 
@@ -465,8 +552,25 @@ const MainContentArea = () => {
           {snackbar.message}
         </Alert>
       </Snackbar>
+
+      {/* E-File Modal */}
+      <EFileModal
+        open={efileModalOpen}
+        onClose={() => setEfileModalOpen(false)}
+        selectedFile={selectedFile}
+        onNewComplaint={handleNewComplaint}
+        onExistingCase={handleExistingCase}
+        onBatchExisting={handleBatchExisting}
+      />
+
+      {/* Exhibit Creator Modal */}
+      <ExhibitCreatorModal
+        open={exhibitCreatorOpen}
+        onClose={() => setExhibitCreatorOpen(false)}
+        mainDocument={selectedFile}
+      />
     </Box>
   );
-};
+});
 
 export default MainContentArea;

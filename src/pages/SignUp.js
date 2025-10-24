@@ -126,6 +126,11 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // COMMENTED OUT: Authentication functionality disabled - forms work silently
+    return;
+    
+    /* ORIGINAL CODE - COMMENTED OUT
     if (!formData.agreeTerms) {
       setSnackbarMessage('You must agree to the Terms of Service to continue.');
       setSnackbarOpen(true);
@@ -169,6 +174,37 @@ const SignUp = () => {
     } finally {
       setIsLoading(false);
     }
+    */
+  };
+
+  const textFieldSx = {
+    '& .MuiOutlinedInput-root': {
+      backgroundColor: 'white',
+      '& fieldset': {
+        borderColor: '#ddd',
+      },
+      '&:hover fieldset': {
+        borderColor: '#FFD700',
+      },
+      '&.Mui-focused fieldset': {
+        borderColor: '#FFD700',
+      },
+      '& input': {
+        color: '#1A2B47 !important',
+      },
+    },
+    '& .MuiInputLabel-root': {
+      color: '#1A2B47',
+    },
+    '& .MuiInputLabel-root.Mui-focused': {
+      color: '#FFD700',
+    },
+    '& .MuiInputBase-input': {
+      color: '#1A2B47 !important',
+    },
+    '& .MuiFormHelperText-root': {
+      color: '#1A2B47 !important',
+    },
   };
 
   const renderStepContent = (step) => {
@@ -184,6 +220,7 @@ const SignUp = () => {
                 value={formData.firstName}
                 onChange={handleInputChange}
                 required
+                sx={textFieldSx}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -194,6 +231,7 @@ const SignUp = () => {
                 value={formData.lastName}
                 onChange={handleInputChange}
                 required
+                sx={textFieldSx}
               />
             </Grid>
             <Grid item xs={12}>
@@ -205,6 +243,7 @@ const SignUp = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
+                sx={textFieldSx}
               />
             </Grid>
             <Grid item xs={12}>
@@ -214,6 +253,7 @@ const SignUp = () => {
                 name="phone"
                 value={formData.phone}
                 onChange={handleInputChange}
+                sx={textFieldSx}
               />
             </Grid>
           </Grid>
@@ -230,6 +270,7 @@ const SignUp = () => {
                 value={formData.firmName}
                 onChange={handleInputChange}
                 required
+                sx={textFieldSx}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -240,6 +281,7 @@ const SignUp = () => {
                 value={formData.position}
                 onChange={handleInputChange}
                 required
+                sx={textFieldSx}
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -254,6 +296,7 @@ const SignUp = () => {
                   native: true,
                 }}
                 required
+                sx={textFieldSx}
               >
                 <option value="">Select State</option>
                 {states.map((state) => (
@@ -279,6 +322,7 @@ const SignUp = () => {
                 onChange={handleInputChange}
                 required
                 helperText="Password must be at least 8 characters long"
+                sx={textFieldSx}
               />
             </Grid>
             <Grid item xs={12}>
@@ -290,6 +334,7 @@ const SignUp = () => {
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
                 required
+                sx={textFieldSx}
               />
             </Grid>
             <Grid item xs={12}>
@@ -300,16 +345,17 @@ const SignUp = () => {
                     checked={formData.agreeTerms}
                     onChange={handleInputChange}
                     required
+                    sx={{ color: '#FFD700' }}
                   />
                 }
                 label={
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>
                     I agree to the{' '}
-                    <Link href="#" color="primary">
+                    <Link href="#" sx={{ color: '#FFD700', textDecoration: 'underline' }}>
                       Terms of Service
                     </Link>{' '}
                     and{' '}
-                    <Link href="#" color="primary">
+                    <Link href="#" sx={{ color: '#FFD700', textDecoration: 'underline' }}>
                       Privacy Policy
                     </Link>
                   </Typography>
@@ -323,9 +369,14 @@ const SignUp = () => {
                     name="agreeMarketing"
                     checked={formData.agreeMarketing}
                     onChange={handleInputChange}
+                    sx={{ color: '#FFD700' }}
                   />
                 }
-                label="I would like to receive marketing communications and updates about quickfile.legal"
+                label={
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>
+                    I would like to receive marketing communications and updates about <Box component="span" sx={{ color: '#FFD700', fontWeight: 'bold' }}>quickfile.legal</Box>
+                  </Typography>
+                }
               />
             </Grid>
           </Grid>
@@ -334,34 +385,34 @@ const SignUp = () => {
       case 3:
         return (
           <Box>
-            <Typography variant="h6" gutterBottom>
+            <Typography variant="h6" gutterBottom sx={{ color: '#1A2B47 !important' }}>
               Please review your information:
             </Typography>
-            <Paper sx={{ p: 3, mb: 3 }}>
+            <Paper sx={{ p: 3, mb: 3, backgroundColor: '#FFFFFF', border: '1px solid #FFD700' }}>
               <Grid container spacing={2}>
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">Name:</Typography>
-                  <Typography variant="body1">{formData.firstName} {formData.lastName}</Typography>
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>Name:</Typography>
+                  <Typography variant="body1" sx={{ color: '#1A2B47 !important' }}>{formData.firstName} {formData.lastName}</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">Email:</Typography>
-                  <Typography variant="body1">{formData.email}</Typography>
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>Email:</Typography>
+                  <Typography variant="body1" sx={{ color: '#1A2B47 !important' }}>{formData.email}</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">Firm:</Typography>
-                  <Typography variant="body1">{formData.firmName}</Typography>
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>Firm:</Typography>
+                  <Typography variant="body1" sx={{ color: '#1A2B47 !important' }}>{formData.firmName}</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">Position:</Typography>
-                  <Typography variant="body1">{formData.position}</Typography>
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>Position:</Typography>
+                  <Typography variant="body1" sx={{ color: '#1A2B47 !important' }}>{formData.position}</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">State:</Typography>
-                  <Typography variant="body1">{formData.state}</Typography>
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>State:</Typography>
+                  <Typography variant="body1" sx={{ color: '#1A2B47 !important' }}>{formData.state}</Typography>
                 </Grid>
                 <Grid item xs={6}>
-                  <Typography variant="body2" color="text.secondary">Phone:</Typography>
-                  <Typography variant="body1">{formData.phone || 'Not provided'}</Typography>
+                  <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>Phone:</Typography>
+                  <Typography variant="body1" sx={{ color: '#1A2B47 !important' }}>{formData.phone || 'Not provided'}</Typography>
                 </Grid>
               </Grid>
             </Paper>
@@ -378,19 +429,22 @@ const SignUp = () => {
       {/* Hero Section */}
       <Box
         sx={{
-          background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+          backgroundColor: '#1A2B47',
           color: 'white',
           py: 8,
           textAlign: 'center',
+          '& .MuiTypography-root': {
+            color: '#FFFFFF !important'
+          }
         }}
       >
         <Container maxWidth="lg">
-          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Sign Up for quickfile.legal
+          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#FFFFFF !important' }}>
+            Sign Up for <Box component="span" sx={{ color: '#FFD700 !important', fontWeight: 'bold' }}>quickfile.legal</Box>
           </Typography>
-          <Typography variant="h6" sx={{ maxWidth: '600px', mx: 'auto' }}>
+          <Typography variant="h6" sx={{ maxWidth: '600px', mx: 'auto', color: '#FFFFFF !important' }}>
             Join thousands of legal professionals who have simplified their eFiling process. 
-            Start your 2-week free trial today!
+            Start your 2-week <Box component="span" sx={{ color: '#FFD700 !important', fontWeight: 'bold' }}>FREE</Box> trial today!
           </Typography>
         </Container>
       </Box>
@@ -399,10 +453,10 @@ const SignUp = () => {
         <Grid container spacing={6}>
           {/* Sign Up Form */}
           <Grid item xs={12} md={8}>
-            <Card sx={{ p: 4 }}>
+            <Card sx={{ p: 4, border: '1px solid #FFD700' }}>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
-                <PersonAdd sx={{ fontSize: 40, color: '#1976d2', mr: 2 }} />
-                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                <PersonAdd sx={{ fontSize: 40, color: '#FFD700', mr: 2 }} />
+                <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#1A2B47' }}>
                   Create Your Account
                 </Typography>
               </Box>
@@ -410,7 +464,28 @@ const SignUp = () => {
               <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
                 {steps.map((label) => (
                   <Step key={label}>
-                    <StepLabel>{label}</StepLabel>
+                    <StepLabel sx={{ 
+                      '& .MuiStepLabel-label': {
+                        color: '#1A2B47 !important',
+                        '&.Mui-active': {
+                          color: '#FFD700 !important',
+                        },
+                        '&.Mui-completed': {
+                          color: '#1A2B47 !important',
+                        },
+                      },
+                      '& .MuiStepIcon-root': {
+                        color: '#ddd',
+                        '&.Mui-active': {
+                          color: '#FFD700',
+                        },
+                        '&.Mui-completed': {
+                          color: '#1A2B47',
+                        },
+                      },
+                    }}>
+                      {label}
+                    </StepLabel>
                   </Step>
                 ))}
               </Stepper>
@@ -422,7 +497,13 @@ const SignUp = () => {
                   <Button
                     disabled={activeStep === 0}
                     onClick={handleBack}
-                    sx={{ mr: 1 }}
+                    sx={{ 
+                      mr: 1,
+                      color: '#1A2B47',
+                      '&:hover': {
+                        backgroundColor: 'rgba(26, 43, 71, 0.1)',
+                      }
+                    }}
                   >
                     Back
                   </Button>
@@ -433,7 +514,18 @@ const SignUp = () => {
                         variant="contained"
                         size="large"
                         disabled={isLoading}
-                        sx={{ px: 4 }}
+                        sx={{ 
+                          px: 4,
+                          backgroundColor: '#FFD700',
+                          color: '#1A2B47',
+                          '&:hover': {
+                            backgroundColor: '#E6C200',
+                          },
+                          '&:disabled': {
+                            backgroundColor: '#ddd',
+                            color: '#666',
+                          }
+                        }}
                         startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
                       >
                         {isLoading ? 'Creating Account...' : 'Create Account'}
@@ -443,7 +535,14 @@ const SignUp = () => {
                         variant="contained"
                         onClick={handleNext}
                         size="large"
-                        sx={{ px: 4 }}
+                        sx={{ 
+                          px: 4,
+                          backgroundColor: '#FFD700',
+                          color: '#1A2B47',
+                          '&:hover': {
+                            backgroundColor: '#E6C200',
+                          }
+                        }}
                       >
                         Next
                       </Button>
@@ -456,24 +555,33 @@ const SignUp = () => {
 
           {/* Benefits Sidebar */}
           <Grid item xs={12} md={4}>
-            <Card sx={{ p: 4, backgroundColor: '#f8f9fa' }}>
-              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
+            <Card sx={{ p: 4, backgroundColor: '#FFFFFF', border: '1px solid #FFD700' }}>
+              <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', color: '#1A2B47' }}>
                 What You Get
               </Typography>
               <List>
                 {benefits.map((benefit, index) => (
                   <ListItem key={index} sx={{ px: 0 }}>
                     <ListItemIcon>
-                      <CheckCircle sx={{ color: '#1976d2' }} />
+                      <CheckCircle sx={{ color: '#FFD700' }} />
                     </ListItemIcon>
-                    <ListItemText primary={benefit} />
+                    <ListItemText 
+                      primary={benefit} 
+                      sx={{ 
+                        color: '#1A2B47 !important',
+                        '& .MuiListItemText-primary': {
+                          color: '#1A2B47 !important',
+                          fontWeight: '500',
+                        }
+                      }} 
+                    />
                   </ListItem>
                 ))}
               </List>
 
-              <Divider sx={{ my: 3 }} />
+              <Divider sx={{ my: 3, backgroundColor: '#FFD700' }} />
 
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: '#1A2B47' }}>
                 Already have an account?
               </Typography>
               <Button
@@ -481,24 +589,32 @@ const SignUp = () => {
                 fullWidth
                 component={Link}
                 href="/login"
-                sx={{ mt: 2 }}
+                sx={{ 
+                  mt: 2,
+                  borderColor: '#FFD700',
+                  color: '#FFD700',
+                  '&:hover': {
+                    borderColor: '#E6C200',
+                    backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                  },
+                }}
               >
                 Sign In
               </Button>
             </Card>
 
             {/* Contact Info */}
-            <Card sx={{ p: 3, mt: 3, backgroundColor: '#e3f2fd' }}>
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+            <Card sx={{ p: 3, mt: 3, backgroundColor: '#1A2B47', border: '1px solid #FFD700' }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', color: '#FFFFFF' }}>
                 Need Help?
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                <Phone sx={{ fontSize: 20, color: '#1976d2', mr: 1 }} />
-                <Typography variant="body2">(833) 657-4812</Typography>
+                <Phone sx={{ fontSize: 20, color: '#FFD700', mr: 1 }} />
+                <Typography variant="body2" sx={{ color: '#CCCCCC' }}>(833) 657-4812</Typography>
               </Box>
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <Email sx={{ fontSize: 20, color: '#1976d2', mr: 1 }} />
-                <Typography variant="body2">sales@quickfile.legal.com</Typography>
+                <Email sx={{ fontSize: 20, color: '#FFD700', mr: 1 }} />
+                <Typography variant="body2" sx={{ color: '#CCCCCC' }}>sales@quickfile.legal.com</Typography>
               </Box>
             </Card>
           </Grid>

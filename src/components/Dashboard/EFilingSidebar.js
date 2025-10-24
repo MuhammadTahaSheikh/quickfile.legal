@@ -17,7 +17,7 @@ import {
   ExitToApp,
 } from '@mui/icons-material';
 
-const EFilingSidebar = () => {
+const EFilingSidebar = ({ onEFileClick }) => {
   const [selectedEFiling, setSelectedEFiling] = useState('Pierre A Louis');
   const [selectedProcess, setSelectedProcess] = useState('EFile');
 
@@ -46,6 +46,9 @@ const EFilingSidebar = () => {
 
   const handleProcessSelect = (process) => {
     setSelectedProcess(process);
+    if (process === 'EFile' && onEFileClick) {
+      onEFileClick();
+    }
   };
 
   const handleStandaloneClick = (action) => {

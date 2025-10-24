@@ -18,10 +18,10 @@ const HeroSection = () => {
 
   return (
     <Box>
-      {/* Top Informational Section (Light Theme) */}
+      {/* Top Informational Section (Dark Theme) */}
       <Box
         sx={{
-          backgroundColor: 'white',
+          backgroundColor: '#1A2B47',
           py: 8,
           textAlign: 'center',
         }}
@@ -32,19 +32,19 @@ const HeroSection = () => {
             component="h1"
             sx={{
               fontWeight: 'bold',
-              color: '#333',
+              color: '#FFFFFF',
               mb: 2,
               fontSize: { xs: '2rem', md: '3rem' },
             }}
           >
-            QUICKFILE.LEGAL - REVOLUTIONARY LEGAL DOCUMENT MANAGEMENT
+            <Box component="span" sx={{ color: '#FFD700' }}>QUICKFILE.LEGAL</Box> - REVOLUTIONARY LEGAL DOCUMENT MANAGEMENT
           </Typography>
           
           <Divider
             sx={{
               width: 100,
               height: 2,
-              backgroundColor: '#ccc',
+              backgroundColor: '#FFD700',
               mx: 'auto',
               mb: 4,
             }}
@@ -53,7 +53,7 @@ const HeroSection = () => {
           <Typography
             variant="body1"
             sx={{
-              color: '#333',
+              color: '#FFFFFF',
               maxWidth: '900px',
               mx: 'auto',
               lineHeight: 1.6,
@@ -72,12 +72,12 @@ const HeroSection = () => {
           <Typography
             variant="h5"
             sx={{
-              color: '#333',
+              color: '#FFD700',
               fontWeight: 'bold',
               mb: 4,
             }}
           >
-            Start Your Free Trial - No Credit Card Required
+            Start Your <Box component="span" sx={{ color: '#FFD700' }}>FREE</Box> Trial - No Credit Card Required
           </Typography>
         </Container>
       </Box>
@@ -114,15 +114,15 @@ const HeroSection = () => {
             startIcon={<Star />}
             onClick={handleGetStarted}
             sx={{
-              backgroundColor: '#1976d2',
-              color: 'white',
+              backgroundColor: '#FFD700',
+              color: '#1A2B47',
               px: 6,
               py: 2,
               fontSize: '1.2rem',
               fontWeight: 'bold',
               borderRadius: 2,
               '&:hover': {
-                backgroundColor: '#1565c0',
+                backgroundColor: '#E6C200',
               },
             }}
           >
