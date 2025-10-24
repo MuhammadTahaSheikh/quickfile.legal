@@ -143,13 +143,13 @@ const Header = () => {
               <Button color="inherit" component={Link} to="/faq">
                 FAQ
               </Button>
-              <Button
+              {/* <Button
                 color="inherit"
                 onClick={handleTutorialsClick}
                 sx={{ textTransform: 'none' }}
               >
                 Tutorials
-              </Button>
+              </Button> */}
               {isAuthenticated ? (
                 <>
                   <Button color="inherit" component={Link} to="/dashboard">
