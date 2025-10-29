@@ -198,5 +198,3 @@ Authorization: Bearer <user_jwt_token>
 - All endpoints verify that the requesting user is an admin
 - The server authenticates incoming requests using the user's JWT token
 
-
-
