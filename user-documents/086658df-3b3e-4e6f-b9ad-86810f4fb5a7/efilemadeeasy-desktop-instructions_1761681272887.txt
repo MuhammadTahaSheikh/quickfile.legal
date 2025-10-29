@@ -1,0 +1,13 @@
+
+# eFileMadeEasy Desktop App
+# To run this application:
+
+# 1. Install Python 3.7 or higher
+# 2. Install required packages:
+pip install tkinter pillow
+
+# 3. Run the application:
+python main.py
+
+# The desktop app will open with all the functionality shown in the web version.
+    
