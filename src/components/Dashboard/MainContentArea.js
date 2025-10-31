@@ -1,4 +1,4 @@
-import React, { useState, useRef, forwardRef, useImperativeHandle } from 'react';
+import React, { useState, useRef, forwardRef, useImperativeHandle, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -26,8 +26,10 @@ import {
 } from '@mui/icons-material';
 import EFileModal from './EFileModal';
 import ExhibitCreatorModal from './ExhibitCreatorModal';
+import { uploadFile, getUserFiles, deleteFile, checkBackendHealth } from '../../lib/backendApi';
+import { supabase } from '../../lib/supabase';
 
-const MainContentArea = forwardRef((props, ref) => {
+const MainContentArea = forwardRef(({ user }, ref) => {
   const fileInputRef = useRef(null);
   const [processQueue, setProcessQueue] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -67,56 +69,212 @@ const MainContentArea = forwardRef((props, ref) => {
     return typeMap[extension] || 'File';
   };
 
+  // Load uploaded files on mount
+  useEffect(() => {
+    const loadUserFiles = async () => {
+      if (!user) return;
+
+      try {
+        // Use unique user ID instead of username
+        const userId = user.id;
+
+        const result = await getUserFiles(userId);
+        
+        if (result.success && result.files.length > 0) {
+          // Convert backend file data to processQueue format
+          const loadedFiles = result.files.map((file, index) => ({
+            id: Date.now() + index,
+            name: file.filename.split('_').slice(0, -1).join('_') || file.filename, // Remove timestamp
+            status: 'Ready to File',
+            size: formatFileSize(file.size),
+            type: getFileType(file.filename),
+            file: null, // No file object for backend files
+            uploadDate: new Date(file.uploadDate).toISOString(),
+            backendPath: file.path || null,
+            backendFilename: file.filename,
+            loadedFromBackend: true
+          }));
+
+          setProcessQueue(loadedFiles);
+          setNextId(prev => prev + loadedFiles.length);
+        }
+      } catch (error) {
+        console.error('Error loading user files:', error);
+      }
+    };
+
+    loadUserFiles();
+  }, [user]);
+
   const handleAddFile = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileInputChange = (event) => {
+  const handleFileInputChange = async (event) => {
     const files = Array.from(event.target.files);
     if (files.length === 0) return;
 
     setIsUploading(true);
     
-    // Simulate file processing delay
-    setTimeout(() => {
-      const newFiles = files.map(file => ({
-        id: nextId + files.indexOf(file),
-        name: file.name,
-        status: 'Ready to File',
-        size: formatFileSize(file.size),
-        type: getFileType(file.name),
-        file: file,
-        uploadDate: new Date().toISOString(),
-      }));
+    try {
+      // Debug: Log user data
+      console.log('User data:', user);
+      console.log('User metadata:', user?.user_metadata);
+      console.log('User email:', user?.email);
+      
+      // Use unique user ID for folder creation
+      const userId = user?.id || 'unknown';
 
-      setProcessQueue(prev => [...prev, ...newFiles]);
-      setNextId(prev => prev + files.length);
-      setIsUploading(false);
+      console.log('Using userId:', userId);
+
+      // Check backend health to decide whether to upload or queue offline
+      const health = await checkBackendHealth();
+      const backendOk = health?.status === 'ok';
+
+      if (!backendOk) {
+        // Queue files locally without uploading
+        const queuedFiles = files.map((file, index) => ({
+          id: nextId + index,
+          name: file.name,
+          status: 'Queued (offline)',
+          size: formatFileSize(file.size),
+          type: getFileType(file.name),
+          file: file,
+          uploadDate: new Date().toISOString(),
+          backendPath: null,
+          backendFilename: null,
+          offlineQueued: true,
+        }));
+
+        setProcessQueue(prev => [...prev, ...queuedFiles]);
+        setNextId(prev => prev + files.length);
+        setSnackbar({
+          open: true,
+          message: `${files.length} file(s) added to process queue (backend offline)`,
+          severity: 'warning'
+        });
+      } else {
+        // Upload files to backend
+        const uploadPromises = files.map(async (file) => {
+          const result = await uploadFile(file, userId);
+          if (result.success) {
+            return {
+              id: nextId + files.indexOf(file),
+              name: file.name,
+              status: 'Ready to File',
+              size: formatFileSize(file.size),
+              type: getFileType(file.name),
+              file: file,
+              uploadDate: new Date().toISOString(),
+              backendPath: result.file.path,
+              backendFilename: result.file.filename,
+            };
+          } else {
+            throw new Error(result.error || 'Upload failed');
+          }
+        });
+
+        const newFiles = await Promise.all(uploadPromises);
+
+        setProcessQueue(prev => [...prev, ...newFiles]);
+        setNextId(prev => prev + files.length);
+        setSnackbar({
+          open: true,
+          message: `${files.length} file(s) added to process queue and uploaded to server`,
+          severity: 'success'
+        });
+      }
+    } catch (error) {
+      console.error('Error uploading files:', error);
       setSnackbar({
         open: true,
-        message: `${files.length} file(s) added to process queue`,
-        severity: 'success'
+        message: `Error uploading files: ${error.message}`,
+        severity: 'error'
       });
+    } finally {
+      setIsUploading(false);
       
       // Reset file input
       event.target.value = '';
-    }, 1000);
+    }
   };
 
-  const handleRemoveFile = (fileId) => {
-    setProcessQueue(prev => prev.filter(file => file.id !== fileId));
-    setSnackbar({
-      open: true,
-      message: 'File removed from process queue',
-      severity: 'info'
-    });
+  const handleRemoveFile = async (fileId) => {
+    try {
+      const fileToRemove = processQueue.find(f => f.id === fileId);
+      
+      // If file is loaded from backend, delete it from backend
+      if (fileToRemove?.loadedFromBackend && fileToRemove?.backendFilename) {
+        const result = await deleteFile(user.id, fileToRemove.backendFilename);
+        
+        if (!result.success) {
+          setSnackbar({
+            open: true,
+            message: `Error: ${result.error}`,
+            severity: 'error'
+          });
+          return;
+        }
+      }
+      
+      // Remove from UI
+      setProcessQueue(prev => prev.filter(file => file.id !== fileId));
+      setSnackbar({
+        open: true,
+        message: 'File deleted successfully',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      setSnackbar({
+        open: true,
+        message: 'Error deleting file',
+        severity: 'error'
+      });
+    }
   };
 
-  const handleViewFile = (file) => {
+  const handleViewFile = async (file) => {
     if (file.file) {
-      // Create object URL for file preview
+      // Create object URL for file preview (for new uploads)
       const url = URL.createObjectURL(file.file);
       window.open(url, '_blank');
+    } else if (file.loadedFromBackend && file.backendFilename) {
+      // For files loaded from backend, fetch with auth and open
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.access_token) {
+          throw new Error('No access token available');
+        }
+
+        const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/upload/files/${user.id}/${encodeURIComponent(file.backendFilename)}`;
+        
+        // Fetch the file with auth token
+        const response = await fetch(downloadUrl, {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to download file');
+        }
+
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        
+        // Clean up the URL after a delay
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      } catch (error) {
+        console.error('Error opening file:', error);
+        setSnackbar({
+          open: true,
+          message: 'Error opening file',
+          severity: 'error'
+        });
+      }
     } else {
       setSnackbar({
         open: true,
@@ -176,6 +334,8 @@ const MainContentArea = forwardRef((props, ref) => {
         return <CheckCircle color="success" />;
       case 'Processing':
         return <CloudUpload color="warning" />;
+      case 'Queued (offline)':
+        return <Warning color="warning" />;
       case 'Completed':
         return <CheckCircle color="success" />;
       default:
@@ -189,6 +349,8 @@ const MainContentArea = forwardRef((props, ref) => {
         return '#4caf50';
       case 'Processing':
         return '#ff9800';
+      case 'Queued (offline)':
+        return '#f57c00';
       case 'Completed':
         return '#2196f3';
       default:
@@ -203,7 +365,7 @@ const MainContentArea = forwardRef((props, ref) => {
         display: 'flex',
         flexDirection: 'column',
         height: '100%',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#FFFFFF',
         overflow: 'hidden',
       }}
     >
@@ -223,7 +385,7 @@ const MainContentArea = forwardRef((props, ref) => {
           sx={{
             fontWeight: 'bold',
             fontSize: '18px',
-            color: '#333',
+            color: '#1A2B47',
             mb: 3,
           }}
         >
@@ -233,8 +395,8 @@ const MainContentArea = forwardRef((props, ref) => {
         <Paper
           sx={{
             flex: 1,
-            border: '1px solid #e0e0e0',
-            backgroundColor: 'white',
+            border: '1px solid #FFD700',
+            backgroundColor: '#FFFFFF',
             overflow: 'auto',
             minHeight: 0,
             borderRadius: '8px',
@@ -251,12 +413,12 @@ const MainContentArea = forwardRef((props, ref) => {
                       py: 1.5,
                       px: 2,
                       cursor: 'pointer',
-                      backgroundColor: selectedFile?.id === item.id ? '#e3f2fd' : 'transparent',
-                      border: selectedFile?.id === item.id ? '2px solid #1976d2' : '2px solid transparent',
+                      backgroundColor: selectedFile?.id === item.id ? 'rgba(255, 215, 0, 0.1)' : 'transparent',
+                      border: selectedFile?.id === item.id ? '2px solid #FFD700' : '2px solid transparent',
                       borderRadius: '8px',
                       mb: 1,
                       '&:hover': {
-                        backgroundColor: selectedFile?.id === item.id ? '#e3f2fd' : '#f5f5f5',
+                        backgroundColor: selectedFile?.id === item.id ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255, 215, 0, 0.05)',
                       },
                     }}
                   >
@@ -268,7 +430,11 @@ const MainContentArea = forwardRef((props, ref) => {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography
                             variant="body2"
-                            sx={{ fontWeight: 'medium', fontSize: '14px' }}
+                            sx={{ 
+                              fontWeight: 'medium', 
+                              fontSize: '14px',
+                              color: '#1A2B47'
+                            }}
                           >
                             {item.name}
                           </Typography>
@@ -290,14 +456,14 @@ const MainContentArea = forwardRef((props, ref) => {
                       }
                       secondary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 0.5 }}>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: '#1A2B47' }}>
                             {item.size}
                           </Typography>
-                          <Typography variant="caption" color="text.secondary">
+                          <Typography variant="caption" sx={{ color: '#1A2B47' }}>
                             {item.type}
                           </Typography>
                           {item.uploadDate && (
-                            <Typography variant="caption" color="text.secondary">
+                            <Typography variant="caption" sx={{ color: '#1A2B47' }}>
                               {new Date(item.uploadDate).toLocaleDateString()}
                             </Typography>
                           )}
@@ -308,7 +474,7 @@ const MainContentArea = forwardRef((props, ref) => {
                       <IconButton
                         size="small"
                         onClick={() => handleViewFile(item)}
-                        sx={{ color: '#1976d2' }}
+                        sx={{ color: '#FFD700' }}
                         title="View File"
                       >
                         <Visibility fontSize="small" />
@@ -339,10 +505,10 @@ const MainContentArea = forwardRef((props, ref) => {
               }}
             >
               <Description sx={{ fontSize: 48, mb: 2, opacity: 0.3 }} />
-              <Typography variant="body2">
+              <Typography variant="body2" sx={{ color: '#1A2B47' }}>
                 No files in process queue
               </Typography>
-              <Typography variant="caption">
+              <Typography variant="caption" sx={{ color: '#1A2B47' }}>
                 Add files to get started
               </Typography>
             </Box>
@@ -353,8 +519,8 @@ const MainContentArea = forwardRef((props, ref) => {
       {/* EFile Options Section */}
       <Box sx={{ 
         p: 3, 
-        borderTop: '1px solid #e0e0e0', 
-        backgroundColor: '#f8f9fa',
+        borderTop: '1px solid #FFD700', 
+        backgroundColor: '#FFFFFF',
         minHeight: '120px',
         display: 'flex',
         flexDirection: 'column',
@@ -365,7 +531,7 @@ const MainContentArea = forwardRef((props, ref) => {
           sx={{
             fontWeight: 'bold',
             fontSize: '18px',
-            color: '#333',
+            color: '#1A2B47',
             mb: 3,
           }}
         >
@@ -393,12 +559,13 @@ const MainContentArea = forwardRef((props, ref) => {
               py: 1.5,
               minWidth: '140px',
               height: '48px',
-              backgroundColor: '#1976d2',
+              backgroundColor: '#FFD700',
+              color: '#1A2B47',
               borderRadius: '8px',
-              boxShadow: '0 2px 4px rgba(25, 118, 210, 0.3)',
+              boxShadow: '0 2px 4px rgba(255, 215, 0, 0.3)',
               '&:hover': {
-                backgroundColor: '#1565c0',
-                boxShadow: '0 4px 8px rgba(25, 118, 210, 0.4)',
+                backgroundColor: '#E6C200',
+                boxShadow: '0 4px 8px rgba(255, 215, 0, 0.4)',
                 transform: 'translateY(-1px)',
               },
               '&:disabled': {
@@ -482,15 +649,15 @@ const MainContentArea = forwardRef((props, ref) => {
               py: 1.5,
               minWidth: '140px',
               height: '48px',
-              borderColor: '#28a745',
-              color: '#28a745',
+              borderColor: '#1A2B47',
+              color: '#1A2B47',
               borderRadius: '8px',
               borderWidth: '2px',
               '&:hover': {
-                borderColor: '#218838',
-                backgroundColor: '#d4edda',
+                borderColor: '#0F1A2F',
+                backgroundColor: 'rgba(26, 43, 71, 0.1)',
                 transform: 'translateY(-1px)',
-                boxShadow: '0 2px 4px rgba(40, 167, 69, 0.3)',
+                boxShadow: '0 2px 4px rgba(26, 43, 71, 0.3)',
               },
               '&:disabled': {
                 borderColor: '#ccc',
@@ -517,12 +684,13 @@ const MainContentArea = forwardRef((props, ref) => {
               py: 1.5,
               minWidth: '140px',
               height: '48px',
-              backgroundColor: '#ff9800',
+              backgroundColor: '#FFD700',
+              color: '#1A2B47',
               borderRadius: '8px',
-              boxShadow: '0 2px 4px rgba(255, 152, 0, 0.3)',
+              boxShadow: '0 2px 4px rgba(255, 215, 0, 0.3)',
               '&:hover': {
-                backgroundColor: '#f57c00',
-                boxShadow: '0 4px 8px rgba(255, 152, 0, 0.4)',
+                backgroundColor: '#E6C200',
+                boxShadow: '0 4px 8px rgba(255, 215, 0, 0.4)',
                 transform: 'translateY(-1px)',
               },
               '&:disabled': {

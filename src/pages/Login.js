@@ -39,7 +39,7 @@ import {
 } from '@mui/icons-material';
 
 const Login = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, resetPassword, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
@@ -82,10 +82,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // COMMENTED OUT: Authentication functionality disabled - forms work silently
-    return;
-    
-    /* ORIGINAL CODE - COMMENTED OUT
     if (!formData.email || !formData.password) {
       setSnackbarMessage('Please fill in all required fields.');
       setSnackbarOpen(true);
@@ -121,12 +117,42 @@ const Login = () => {
     } finally {
       setIsLoading(false);
     }
-    */
   };
 
-  const handleForgotPassword = () => {
-    setSnackbarMessage('Password reset instructions have been sent to your email.');
-    setSnackbarOpen(true);
+  const handleForgotPassword = async () => {
+    if (!formData.email) {
+      setSnackbarMessage('Please enter your email address first.');
+      setSnackbarOpen(true);
+      return;
+    }
+
+    try {
+      const result = await resetPassword(formData.email);
+      if (result.success) {
+        setSnackbarMessage(result.message);
+        setSnackbarOpen(true);
+      } else {
+        setSnackbarMessage(result.error || 'Failed to send password reset email.');
+        setSnackbarOpen(true);
+      }
+    } catch (error) {
+      setSnackbarMessage('An error occurred. Please try again.');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithGoogle();
+      if (!result.success) {
+        setSnackbarMessage(result.error || 'Google sign-in failed. Please try again.');
+        setSnackbarOpen(true);
+      }
+      // Note: If successful, user will be redirected automatically
+    } catch (error) {
+      setSnackbarMessage('An error occurred during Google sign-in. Please try again.');
+      setSnackbarOpen(true);
+    }
   };
 
   const textFieldSx = {
@@ -300,11 +326,43 @@ const Login = () => {
                   {isLoading ? 'Signing In...' : 'Sign In'}
                 </Button>
 
-                <Divider sx={{ my: 3, '& .MuiDivider-root': { borderColor: '#FFD700' } }}>
+                {/* <Divider sx={{ my: 3, '& .MuiDivider-root': { borderColor: '#FFD700' } }}>
                   <Typography variant="body2" sx={{ color: '#1A2B47 !important', px: 2 }}>
                     OR
                   </Typography>
-                </Divider>
+                </Divider> */}
+
+                {/* <Button
+                  variant="outlined"
+                  fullWidth
+                  size="large"
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoading}
+                  sx={{ 
+                    py: 1.5, s
+                    mb: 3,
+                    borderColor: '#4285F4',
+                    color: '#4285F4',
+                    '&:hover': {
+                      borderColor: '#3367D6',
+                      backgroundColor: 'rgba(66, 133, 244, 0.04)',
+                    },
+                    '&:disabled': {
+                      borderColor: '#ddd',
+                      color: '#666',
+                    }
+                  }}
+                  startIcon={
+                    <Box
+                      component="img"
+                      src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDBDNS4zNzQgMCAwIDUuMzczIDAgMTJjMCA1LjMwMiAzLjQzOCA5LjggOC4yMDMgMTEuMzg3Yy42LjExMi44Mi0uMjU5LjgyLS41NzJ2LTIuMjM0Yy0zLjMzOC43MjctNC4wMzMtMS40MTYtNC4wMzMtMS40MTZjLS41NDYtMS4zODctMS4zMzMtMS43NTYtMS4zMzMtMS43NTZjLTEuMDg5LS43NDUuMDgzLS43MjkuMDgzLS43MjljMS4yMDUuMDg0IDEuODM5IDEuMjM3IDEuODM5IDEuMjM3YzEuMDcgMS44MjUgMi44MTcgMS4yOTcgMy40OTUuOTkzYy4xMDgtLjc3Mi40MTctMS4yOTUuNzYtMS41OTVjLTIuNjY1LS4zMDUtNS40NjctMS4zMzQtNS40NjctNS45MzhjMC0xLjMxMi40NjktMi4zODMgMS4yMzUtMy4yMjNjLS4xMjMtLjMwMy0uNTM1LTEuNTI0LjExNy0zLjE3NmMwIDAgMS4wMDctLjMyMiAzLjMwMSAxLjIzYy45NTYtLjI2NiAxLjk4LS4zOTkgMy0uNDA0YzEuMDIuMDA1IDIuMDQ0LjEzOCAzIC40MDRjMi4yOTEtMS41NTIgMy4yOTctMS4yMyAzLjI5Ny0xLjIzYy42NTIgMS42NTIuMjQgMi44NzMuMTE3IDMuMTc2Yy43NjYuODQgMS4yMzEgMS45MTEgMS4yMzEgMy4yMjNjMCA0LjYxLTIuODA1IDUuNjI0LTUuNDc1IDUuOTI1Yy40Mi4zNi44MSAxLjA5Ni44MSAyLjIxNnYzLjI5M2MwIC4zMTUuMTkyLjY3NC44MDEuNTU5QzIwLjU2NSAyMS43OTcgMjQgMTcuMyAyNCAxMmMwLTYuNjI3LTUuMzczLTEyLTEyLTEyeiIgZmlsbD0iIzMzMzMzMyIvPgo8L3N2Zz4K"
+                      alt="Google"
+                      sx={{ width: 20, height: 20 }}
+                    />
+                  }
+                >
+                  Continue with Google
+                </Button> */}
 
                 <Box sx={{ textAlign: 'center' }}>
                   <Typography variant="body2" sx={{ color: '#1A2B47 !important' }}>

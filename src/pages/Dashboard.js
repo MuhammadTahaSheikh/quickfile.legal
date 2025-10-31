@@ -26,7 +26,7 @@ const Dashboard = () => {
       <EFilingSidebar onEFileClick={handleEFileClick} />
       
       {/* Main Content */}
-      <MainContentArea ref={mainContentRef} />
+      <MainContentArea ref={mainContentRef} user={user} />
     </Box>
   );
 };

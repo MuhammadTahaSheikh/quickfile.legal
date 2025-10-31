@@ -12,7 +12,10 @@ import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
 import SignUp from './pages/SignUp';
 import Login from './pages/Login';
+import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import AdminUserList from './components/AdminUserList';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -34,12 +37,21 @@ function App() {
             <Route path="/faq" element={<FAQ />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route 
               path="/dashboard" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/admin/users" 
+              element={
+                <AdminRoute>
+                  <AdminUserList />
+                </AdminRoute>
               } 
             />
           </Routes>

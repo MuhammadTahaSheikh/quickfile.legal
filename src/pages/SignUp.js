@@ -39,7 +39,7 @@ import {
 } from '@mui/icons-material';
 
 const SignUp = () => {
-  const { signup, isAuthenticated } = useAuth();
+  const { signup, isAuthenticated, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
@@ -126,11 +126,6 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // COMMENTED OUT: Authentication functionality disabled - forms work silently
-    return;
-    
-    /* ORIGINAL CODE - COMMENTED OUT
     if (!formData.agreeTerms) {
       setSnackbarMessage('You must agree to the Terms of Service to continue.');
       setSnackbarOpen(true);
@@ -143,7 +138,7 @@ const SignUp = () => {
       const result = await signup(formData);
       
       if (result.success) {
-        setSnackbarMessage('Account created successfully! Please login to continue.');
+        setSnackbarMessage(result.message || 'Account created successfully! Please login with your credentials.');
         setSnackbarOpen(true);
         
         // Reset form
@@ -162,8 +157,14 @@ const SignUp = () => {
         });
         setActiveStep(0);
         
-        // Navigate to login page
-        navigate('/login', { replace: true });
+        // Check if user is already logged in (email confirmed)
+        if (result.user && result.user.email_confirmed_at) {
+          // User is logged in, go to dashboard
+          navigate('/dashboard', { replace: true });
+        } else {
+          // Email confirmation required, go to login page
+          navigate('/login', { replace: true });
+        }
       } else {
         setSnackbarMessage(result.error || 'Signup failed. Please try again.');
         setSnackbarOpen(true);
@@ -174,7 +175,20 @@ const SignUp = () => {
     } finally {
       setIsLoading(false);
     }
-    */
+  };
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const result = await signInWithGoogle();
+      if (!result.success) {
+        setSnackbarMessage(result.error || 'Google sign-in failed. Please try again.');
+        setSnackbarOpen(true);
+      }
+      // Note: If successful, user will be redirected automatically
+    } catch (error) {
+      setSnackbarMessage('An error occurred during Google sign-in. Please try again.');
+      setSnackbarOpen(true);
+    }
   };
 
   const textFieldSx = {
@@ -591,6 +605,7 @@ const SignUp = () => {
                 href="/login"
                 sx={{ 
                   mt: 2,
+                  mb: 2,
                   borderColor: '#FFD700',
                   color: '#FFD700',
                   '&:hover': {
@@ -601,6 +616,41 @@ const SignUp = () => {
               >
                 Sign In
               </Button>
+
+              {/* <Divider sx={{ my: 2, backgroundColor: '#FFD700' }}>
+                <Typography variant="body2" sx={{ color: '#1A2B47 !important', px: 2 }}>
+                  OR
+                </Typography>
+              </Divider> */}
+
+              {/* <Button
+                variant="outlined"
+                fullWidth
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+                sx={{ 
+                  borderColor: '#4285F4',
+                  color: '#4285F4',
+                  '&:hover': {
+                    borderColor: '#3367D6',
+                    backgroundColor: 'rgba(66, 133, 244, 0.04)',
+                  },
+                  '&:disabled': {
+                    borderColor: '#ddd',
+                    color: '#666',
+                  }
+                }}
+                startIcon={
+                  <Box
+                    component="img"
+                    src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDBDNS4zNzQgMCAwIDUuMzczIDAgMTJjMCA1LjMwMiAzLjQzOCA5LjggOC4yMDMgMTEuMzg3Yy42LjExMi44Mi0uMjU5LjgyLS41NzJ2LTIuMjM0Yy0zLjMzOC43MjctNC4wMzMtMS40MTYtNC4wMzMtMS40MTZjLS41NDYtMS4zODctMS4zMzMtMS43NTYtMS4zMzMtMS43NTZjLTEuMDg5LS43NDUuMDgzLS43MjkuMDgzLS43MjljMS4yMDUuMDg0IDEuODM5IDEuMjM3IDEuODM5IDEuMjM3YzEuMDcgMS44MjUgMi44MTcgMS4yOTcgMy40OTUuOTkzYzEuMDgtLjc3Mi40MTctMS4yOTUuNzYtMS41OTVjLTIuNjY1LS4zMDUtNS40NjctMS4zMzQtNS40NjctNS45MzhjMC0xLjMxMi40NjktMi4zODMgMS4yMzUtMy4yMjNjLS4xMjMtLjMwMy0uNTM1LTEuNTI0LjExNy0zLjE3NmMwIDAgMS4wMDctLjMyMiAzLjMwMSAxLjIzYy45NTYtLjI2NiAxLjk4LS4zOTkgMy0uNDA0YzEuMDIuMDA1IDIuMDQ0LjEzOCAzIC40MDRjMi4yOTEtMS41NTIgMy4yOTctMS4yMyAzLjI5Ny0xLjIzYy42NTIgMS42NTIuMjQgMi44NzMuMTE3IDMuMTc2Yy43NjYuODQgMS4yMzEgMS45MTEgMS4yMzEgMy4yMjNjMCA0LjYxLTIuODA1IDUuNjI0LTUuNDc1IDUuOTI1Yy40Mi4zNi44MSAxLjA5Ni44MSAyLjIxNnYzLjI5M2MwIC4zMTUuMTkyLjY3NC44MDEuNTU5QzIwLjU2NSAyMS43OTcgMjQgMTcuMyAyNCAxMmMwLTYuNjI3LTUuMzczLTEyLTEyLTEyeiIgZmlsbD0iIzMzMzMzMyIvPgo8L3N2Zz4K"
+                      alt="Google"
+                    sx={{ width: 20, height: 20 }}
+                  />
+                }
+              >
+                Continue with Google
+              </Button> */}
             </Card>
 
             {/* Contact Info */}

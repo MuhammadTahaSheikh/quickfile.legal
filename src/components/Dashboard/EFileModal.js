@@ -45,6 +45,8 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
           borderRadius: '12px',
           boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
           minHeight: '300px',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #FFD700',
         }
       }}
     >
@@ -56,18 +58,18 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
           justifyContent: 'space-between',
           py: 2,
           px: 3,
-          borderBottom: '1px solid #e0e0e0',
-          backgroundColor: '#f8f9fa',
+          borderBottom: '1px solid #FFD700',
+          backgroundColor: '#1A2B47',
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <CloudUpload sx={{ color: '#1976d2', fontSize: 24 }} />
+          <CloudUpload sx={{ color: '#FFD700', fontSize: 24 }} />
           <Typography
             variant="h6"
             sx={{
               fontWeight: 'bold',
               fontSize: '20px',
-              color: '#333',
+              color: '#FFFFFF',
             }}
           >
             E-File Options
@@ -77,10 +79,10 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
           onClick={onClose}
           size="small"
           sx={{
-            color: '#666',
+            color: '#FFD700',
             '&:hover': {
-              backgroundColor: '#f5f5f5',
-              color: '#333',
+              backgroundColor: 'rgba(255, 215, 0, 0.1)',
+              color: '#E6C200',
             },
           }}
         >
@@ -89,13 +91,13 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
       </DialogTitle>
 
       {/* Content */}
-      <DialogContent sx={{ p: 3 }}>
+      <DialogContent sx={{ p: 3, backgroundColor: '#FFFFFF' }}>
         <Box sx={{ mb: 3 }}>
           <Typography
             variant="body1"
             sx={{
               fontSize: '16px',
-              color: '#555',
+              color: '#1A2B47',
               lineHeight: 1.6,
               mb: 2,
             }}
@@ -111,18 +113,18 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
                 alignItems: 'center',
                 gap: 2,
                 p: 2,
-                backgroundColor: '#f8f9fa',
+                backgroundColor: '#FFFFFF',
                 borderRadius: '8px',
-                border: '1px solid #e0e0e0',
+                border: '1px solid #FFD700',
               }}
             >
-              <Description sx={{ color: '#1976d2', fontSize: 32 }} />
+              <Description sx={{ color: '#FFD700', fontSize: 32 }} />
               <Box>
                 <Typography
                   variant="subtitle1"
                   sx={{
                     fontWeight: '600',
-                    color: '#333',
+                    color: '#1A2B47',
                     fontSize: '14px',
                   }}
                 >
@@ -131,7 +133,7 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
                 <Typography
                   variant="caption"
                   sx={{
-                    color: '#666',
+                    color: '#1A2B47',
                     fontSize: '12px',
                   }}
                 >
@@ -148,7 +150,7 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
           variant="subtitle2"
           sx={{
             fontWeight: '600',
-            color: '#333',
+            color: '#1A2B47',
             mb: 2,
             fontSize: '14px',
           }}
@@ -165,6 +167,7 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
           gap: 2,
           justifyContent: 'center',
           flexWrap: 'wrap',
+          backgroundColor: '#FFFFFF',
         }}
       >
         <Button
@@ -179,12 +182,13 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
             py: 1.5,
             minWidth: '160px',
             height: '48px',
-            backgroundColor: '#1976d2',
+            backgroundColor: '#FFD700',
+            color: '#1A2B47',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(25, 118, 210, 0.3)',
+            boxShadow: '0 2px 4px rgba(255, 215, 0, 0.3)',
             '&:hover': {
-              backgroundColor: '#1565c0',
-              boxShadow: '0 4px 8px rgba(25, 118, 210, 0.4)',
+              backgroundColor: '#E6C200',
+              boxShadow: '0 4px 8px rgba(255, 215, 0, 0.4)',
               transform: 'translateY(-1px)',
             },
           }}
@@ -204,15 +208,15 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
             py: 1.5,
             minWidth: '160px',
             height: '48px',
-            borderColor: '#28a745',
-            color: '#28a745',
+            borderColor: '#1A2B47',
+            color: '#1A2B47',
             borderRadius: '8px',
             borderWidth: '2px',
             '&:hover': {
-              borderColor: '#218838',
-              backgroundColor: '#d4edda',
+              borderColor: '#0F1A2F',
+              backgroundColor: 'rgba(26, 43, 71, 0.1)',
               transform: 'translateY(-1px)',
-              boxShadow: '0 2px 4px rgba(40, 167, 69, 0.3)',
+              boxShadow: '0 2px 4px rgba(26, 43, 71, 0.3)',
             },
           }}
         >
@@ -231,15 +235,15 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
             py: 1.5,
             minWidth: '160px',
             height: '48px',
-            borderColor: '#ff9800',
-            color: '#ff9800',
+            borderColor: '#FFD700',
+            color: '#FFD700',
             borderRadius: '8px',
             borderWidth: '2px',
             '&:hover': {
-              borderColor: '#f57c00',
-              backgroundColor: '#fff3e0',
+              borderColor: '#E6C200',
+              backgroundColor: 'rgba(255, 215, 0, 0.1)',
               transform: 'translateY(-1px)',
-              boxShadow: '0 2px 4px rgba(255, 152, 0, 0.3)',
+              boxShadow: '0 2px 4px rgba(255, 215, 0, 0.3)',
             },
           }}
         >
@@ -257,15 +261,15 @@ const EFileModal = ({ open, onClose, selectedFile, onNewComplaint, onExistingCas
             py: 1.5,
             minWidth: '120px',
             height: '48px',
-            borderColor: '#6c757d',
-            color: '#6c757d',
+            borderColor: '#1A2B47',
+            color: '#1A2B47',
             borderRadius: '8px',
             borderWidth: '2px',
             '&:hover': {
-              borderColor: '#5a6268',
-              backgroundColor: '#f8f9fa',
+              borderColor: '#0F1A2F',
+              backgroundColor: 'rgba(26, 43, 71, 0.1)',
               transform: 'translateY(-1px)',
-              boxShadow: '0 2px 4px rgba(108, 117, 125, 0.3)',
+              boxShadow: '0 2px 4px rgba(26, 43, 71, 0.3)',
             },
           }}
         >

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 
 const AuthContext = createContext();
 
@@ -17,34 +18,50 @@ export const AuthProvider = ({ children }) => {
 
   // Check for existing session on app load
   useEffect(() => {
-    const checkAuthStatus = () => {
+    const checkAuthStatus = async () => {
       try {
-        const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('token');
+        // Get the current session
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (storedUser && storedToken) {
-          setUser(JSON.parse(storedUser));
+        if (error) {
+          console.error('Error checking auth status:', error);
+          setLoading(false);
+          return;
+        }
+
+        if (session?.user) {
+          setUser(session.user);
           setIsAuthenticated(true);
         }
       } catch (error) {
         console.error('Error checking auth status:', error);
-        // Clear invalid data
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
     };
 
     checkAuthStatus();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (session?.user) {
+          setUser(session.user);
+          setIsAuthenticated(true);
+        } else {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const login = async (email, password) => {
     try {
       setLoading(true);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Basic validation
       if (!email || !password) {
@@ -55,43 +72,23 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Password must be at least 6 characters');
       }
       
-      // Check if user exists in localStorage (from previous signup)
-      const storedUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const existingUser = storedUsers.find(user => user.email === email);
-      
-      if (!existingUser) {
-        throw new Error('No account found with this email address');
+      // Sign in with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.user) {
+        setUser(data.user);
+        setIsAuthenticated(true);
+        return { success: true, user: data.user };
       }
       
-      if (existingUser.password !== password) {
-        throw new Error('Invalid password');
-      }
-      
-      // Create user data for login (without password)
-      const userData = {
-        id: existingUser.id,
-        firstName: existingUser.firstName,
-        lastName: existingUser.lastName,
-        email: existingUser.email,
-        firmName: existingUser.firmName,
-        position: existingUser.position,
-        state: existingUser.state,
-        phone: existingUser.phone,
-        joinDate: existingUser.joinDate,
-        subscription: existingUser.subscription,
-        trialEnds: existingUser.trialEnds,
-      };
-
-      const token = 'demo-token-' + Date.now();
-
-      // Store in localStorage
-      localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', token);
-
-      setUser(userData);
-      setIsAuthenticated(true);
-      
-      return { success: true, user: userData };
+      throw new Error('Login failed');
     } catch (error) {
       console.error('Login error:', error);
       return { success: false, error: error.message };
@@ -103,9 +100,6 @@ export const AuthProvider = ({ children }) => {
   const signup = async (userData) => {
     try {
       setLoading(true);
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
       
       // Basic validation
       if (!userData.email || !userData.password) {
@@ -120,31 +114,51 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Passwords do not match');
       }
       
-      // Check if user already exists
-      const storedUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-      const existingUser = storedUsers.find(user => user.email === userData.email);
-      
-      if (existingUser) {
-        throw new Error('An account with this email already exists');
+      // Sign up with Supabase
+      const { data, error } = await supabase.auth.signUp({
+        email: userData.email,
+        password: userData.password,
+        options: {
+          data: {
+            first_name: userData.firstName,
+            last_name: userData.lastName,
+            firm_name: userData.firmName,
+            position: userData.position,
+            state: userData.state,
+            phone: userData.phone,
+            subscription: 'Trial',
+            trial_ends: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+            role: 'user', // Default role for all new users
+          }
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.user) {
+        // Check if email confirmation is required
+        if (data.user.email_confirmed_at) {
+          // Email is already confirmed, auto-login
+          setUser(data.user);
+          setIsAuthenticated(true);
+          return { 
+            success: true, 
+            user: data.user,
+            message: 'Account created successfully! You are now logged in.'
+          };
+        } else {
+          // Email confirmation required
+          return { 
+            success: true, 
+            user: data.user,
+            message: 'Account created successfully! Please check your email to verify your account, then login.'
+          };
+        }
       }
       
-      // For demo purposes, we'll simulate a successful signup
-      const newUser = {
-        id: Date.now().toString(),
-        ...userData,
-        joinDate: new Date().toISOString(),
-        subscription: 'Trial',
-        trialEnds: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-      };
-
-      // Store user credentials for future login validation
-      storedUsers.push(newUser);
-      localStorage.setItem('registeredUsers', JSON.stringify(storedUsers));
-
-      // For signup, we'll just return success without auto-login
-      // User will need to login separately
-      
-      return { success: true, user: newUser };
+      throw new Error('Signup failed');
     } catch (error) {
       console.error('Signup error:', error);
       return { success: false, error: error.message };
@@ -153,20 +167,101 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    // Clear localStorage
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    
-    // Reset state
-    setUser(null);
-    setIsAuthenticated(false);
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Logout error:', error);
+        return { success: false, error: error.message };
+      }
+      
+      // Reset state
+      setUser(null);
+      setIsAuthenticated(false);
+      return { success: true };
+    } catch (error) {
+      console.error('Logout error:', error);
+      return { success: false, error: error.message };
+    }
   };
 
-  const updateUser = (updatedUserData) => {
-    const updatedUser = { ...user, ...updatedUserData };
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+  const resetPassword = async (email) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return { 
+        success: true, 
+        message: 'Password reset instructions have been sent to your email.' 
+      };
+    } catch (error) {
+      console.error('Password reset error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const updateUser = async (updatedUserData) => {
+    try {
+      const { data, error } = await supabase.auth.updateUser({
+        data: updatedUserData
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      if (data.user) {
+        setUser(data.user);
+        return { success: true, user: data.user };
+      }
+      
+      throw new Error('Update failed');
+    } catch (error) {
+      console.error('Update user error:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const signInWithGoogle = async () => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      return { success: true, data };
+    } catch (error) {
+      console.error('Google sign-in error:', error);
+      return { success: false, error: error.message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to get user role
+  const getUserRole = () => {
+    if (!user) return null;
+    return user.user_metadata?.role || 'user';
+  };
+
+  // Helper function to check if user is admin
+  const isAdmin = () => {
+    if (!user) return false;
+    const role = user.user_metadata?.role || 'user';
+    return role === 'admin';
   };
 
   const value = {
@@ -177,6 +272,10 @@ export const AuthProvider = ({ children }) => {
     signup,
     logout,
     updateUser,
+    resetPassword,
+    signInWithGoogle,
+    getUserRole,
+    isAdmin,
   };
 
   return (

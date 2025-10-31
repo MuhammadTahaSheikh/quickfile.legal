@@ -35,10 +35,10 @@ const EFilingSidebar = ({ onEFileClick }) => {
     { id: 'Group EFile', label: 'Group EFile', icon: <Group /> },
   ];
 
-  const standaloneButtons = [
-    { id: 'E-Portal Login', label: 'E-Portal Login', icon: <Login /> },
-    { id: 'Exit Program', label: 'Exit Program', icon: <ExitToApp /> },
-  ];
+  // const standaloneButtons = [
+  //   { id: 'E-Portal Login', label: 'E-Portal Login', icon: <Login /> },
+  //   { id: 'Exit Program', label: 'Exit Program', icon: <ExitToApp /> },
+  // ];
 
   const handleEFilingSelect = (name) => {
     setSelectedEFiling(name);
@@ -61,21 +61,21 @@ const EFilingSidebar = ({ onEFileClick }) => {
       sx={{
         width: 300,
         height: '100%',
-        backgroundColor: '#f8f9fa',
-        borderRight: '1px solid #e0e0e0',
+        backgroundColor: '#FFFFFF',
+        borderRight: '1px solid #FFD700',
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
       }}
     >
       {/* Process Section */}
-      <Box sx={{ p: 3, borderBottom: '1px solid #e0e0e0' }}>
+      <Box sx={{ p: 3, borderBottom: '1px solid #FFD700' }}>
         <Typography
           variant="h6"
           sx={{
             fontWeight: 'bold',
             fontSize: '18px',
-            color: '#333',
+            color: '#1A2B47',
             mb: 3,
           }}
         >
@@ -98,14 +98,14 @@ const EFilingSidebar = ({ onEFileClick }) => {
                 px: 3,
                 height: '56px',
                 borderRadius: '8px',
-                borderColor: '#1976d2',
-                color: selectedProcess === button.id ? 'white' : '#1976d2',
-                backgroundColor: selectedProcess === button.id ? '#1976d2' : 'transparent',
-                boxShadow: selectedProcess === button.id ? '0 2px 4px rgba(25, 118, 210, 0.3)' : 'none',
+                borderColor: '#FFD700',
+                color: selectedProcess === button.id ? '#1A2B47' : '#FFD700',
+                backgroundColor: selectedProcess === button.id ? '#FFD700' : 'transparent',
+                boxShadow: selectedProcess === button.id ? '0 2px 4px rgba(255, 215, 0, 0.3)' : 'none',
                 '&:hover': {
-                  backgroundColor: selectedProcess === button.id ? '#1565c0' : '#e3f2fd',
+                  backgroundColor: selectedProcess === button.id ? '#E6C200' : 'rgba(255, 215, 0, 0.1)',
                   transform: 'translateY(-1px)',
-                  boxShadow: selectedProcess === button.id ? '0 4px 8px rgba(25, 118, 210, 0.4)' : '0 2px 4px rgba(25, 118, 210, 0.2)',
+                  boxShadow: selectedProcess === button.id ? '0 4px 8px rgba(255, 215, 0, 0.4)' : '0 2px 4px rgba(255, 215, 0, 0.2)',
                 },
               }}
             >
@@ -117,7 +117,7 @@ const EFilingSidebar = ({ onEFileClick }) => {
 
       {/* Standalone Buttons */}
       <Box sx={{ p: 3, mt: 'auto' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        {/* <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {standaloneButtons.map((button) => (
             <Button
               key={button.id}
@@ -134,22 +134,22 @@ const EFilingSidebar = ({ onEFileClick }) => {
                 px: 3,
                 height: '56px',
                 borderRadius: '8px',
-                borderColor: '#666',
-                color: '#666',
+                borderColor: '#1A2B47',
+                color: '#1A2B47',
                 borderWidth: '2px',
                 '&:hover': {
-                  backgroundColor: '#f5f5f5',
-                  borderColor: '#333',
-                  color: '#333',
+                  backgroundColor: 'rgba(26, 43, 71, 0.1)',
+                  borderColor: '#0F1A2F',
+                  color: '#0F1A2F',
                   transform: 'translateY(-1px)',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                  boxShadow: '0 2px 4px rgba(26, 43, 71, 0.2)',
                 },
               }}
             >
               {button.label}
             </Button>
           ))}
-        </Box>
+        </Box> */}
       </Box>
     </Box>
   );

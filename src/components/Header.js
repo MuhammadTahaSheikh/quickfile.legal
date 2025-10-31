@@ -23,7 +23,8 @@ import {
   Dashboard, 
   Person, 
   Logout,
-  AccountCircle 
+  AccountCircle,
+  AdminPanelSettings
 } from '@mui/icons-material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -33,7 +34,7 @@ const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [tutorialsAnchor, setTutorialsAnchor] = useState(null);
   const [userMenuAnchor, setUserMenuAnchor] = useState(null);
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, isAdmin } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
@@ -58,10 +59,20 @@ const Header = () => {
     setUserMenuAnchor(null);
   };
 
-  const handleLogout = () => {
-    logout();
-    handleUserMenuClose();
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      handleUserMenuClose();
+      // Small delay to ensure state is updated
+      setTimeout(() => {
+        navigate('/');
+      }, 100);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still close menu and navigate even if logout fails
+      handleUserMenuClose();
+      navigate('/');
+    }
   };
 
   const drawer = (
@@ -157,8 +168,8 @@ const Header = () => {
                   </Button>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <Chip
-                      label={`${user?.firstName} ${user?.lastName}`}
-                      avatar={<Avatar sx={{ width: 24, height: 24 }}>{user?.firstName?.[0]}</Avatar>}
+                      label={`${user?.user_metadata?.first_name || user?.user_metadata?.firstName || 'User'} ${user?.user_metadata?.last_name || user?.user_metadata?.lastName || ''}`}
+                      avatar={<Avatar sx={{ width: 24, height: 24 }}>{(user?.user_metadata?.first_name || user?.user_metadata?.firstName || 'U')[0]}</Avatar>}
                       onClick={handleUserMenuClick}
                       sx={{ color: 'white', backgroundColor: 'rgba(255,255,255,0.2)' }}
                     />
@@ -194,6 +205,19 @@ const Header = () => {
         anchorEl={tutorialsAnchor}
         open={Boolean(tutorialsAnchor)}
         onClose={handleTutorialsClose}
+        PaperProps={{
+          sx: {
+            backgroundColor: '#1A2B47',
+            color: 'white',
+            '& .MuiMenuItem-root': {
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                color: '#FFD700',
+              },
+            },
+          },
+        }}
       >
         <MenuItem onClick={() => { handleTutorialsClose(); navigate('/tutorials/efiling'); }}>
           E filing Tutorials
@@ -225,17 +249,36 @@ const Header = () => {
         anchorEl={userMenuAnchor}
         open={Boolean(userMenuAnchor)}
         onClose={handleUserMenuClose}
+        PaperProps={{
+          sx: {
+            backgroundColor: '#1A2B47',
+            color: 'white',
+            '& .MuiMenuItem-root': {
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                color: '#FFD700',
+              },
+            },
+          },
+        }}
       >
         <MenuItem onClick={() => { handleUserMenuClose(); navigate('/dashboard'); }}>
-          <Dashboard sx={{ mr: 1 }} />
+          <Dashboard sx={{ mr: 1, color: '#FFD700' }} />
           Dashboard
         </MenuItem>
+        {isAdmin() && (
+          <MenuItem onClick={() => { handleUserMenuClose(); navigate('/admin/users'); }}>
+            <AdminPanelSettings sx={{ mr: 1, color: '#FFD700' }} />
+            Admin Panel
+          </MenuItem>
+        )}
         <MenuItem onClick={() => { handleUserMenuClose(); navigate('/profile'); }}>
-          <Person sx={{ mr: 1 }} />
+          <Person sx={{ mr: 1, color: '#FFD700' }} />
           Profile
         </MenuItem>
         <MenuItem onClick={handleLogout}>
-          <Logout sx={{ mr: 1 }} />
+          <Logout sx={{ mr: 1, color: '#FFD700' }} />
           Logout
         </MenuItem>
       </Menu>

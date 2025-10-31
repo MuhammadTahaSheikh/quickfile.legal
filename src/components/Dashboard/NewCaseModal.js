@@ -26,6 +26,54 @@ import {
 } from '@mui/icons-material';
 
 const NewCaseModal = ({ open, onClose, onContinue }) => {
+  const formControlStyles = {
+    '& .MuiFormControlLabel-label': {
+      color: '#1A2B47',
+    },
+    '& .MuiRadio-root': {
+      color: '#FFD700',
+      '&.Mui-checked': {
+        color: '#FFD700',
+      },
+    },
+    '& .MuiCheckbox-root': {
+      color: '#FFD700',
+      '&.Mui-checked': {
+        color: '#FFD700',
+      },
+    },
+    '& .MuiSelect-root': {
+      color: '#1A2B47',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#FFD700',
+    },
+    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#E6C200',
+    },
+    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#FFD700',
+    },
+    '& .MuiInputBase-input': {
+      color: '#1A2B47',
+    },
+    '& .MuiSelect-icon': {
+      color: '#FFD700',
+    },
+    '& .MuiMenuItem-root': {
+      color: '#1A2B47',
+      '&:hover': {
+        backgroundColor: 'rgba(255, 215, 0, 0.1)',
+      },
+      '&.Mui-selected': {
+        backgroundColor: 'rgba(255, 215, 0, 0.2)',
+        '&:hover': {
+          backgroundColor: 'rgba(255, 215, 0, 0.3)',
+        },
+      },
+    },
+  };
+
   const [formData, setFormData] = useState({
     // Type of Court
     circuitCourt: 'civil',
@@ -138,6 +186,8 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
           boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
           minHeight: '600px',
           maxHeight: '90vh',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #FFD700',
         }
       }}
     >
@@ -149,8 +199,8 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
           justifyContent: 'space-between',
           py: 2,
           px: 3,
-          borderBottom: '1px solid #e0e0e0',
-          backgroundColor: '#f8f9fa',
+          borderBottom: '1px solid #FFD700',
+          backgroundColor: '#1A2B47',
         }}
       >
         <Typography
@@ -158,7 +208,7 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
           sx={{
             fontWeight: 'bold',
             fontSize: '20px',
-            color: '#333',
+            color: '#FFFFFF',
           }}
         >
           New Case
@@ -167,10 +217,10 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
           onClick={onClose}
           size="small"
           sx={{
-            color: '#666',
+            color: '#FFD700',
             '&:hover': {
-              backgroundColor: '#f5f5f5',
-              color: '#333',
+              backgroundColor: 'rgba(255, 215, 0, 0.1)',
+              color: '#E6C200',
             },
           }}
         >
@@ -179,23 +229,24 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
       </DialogTitle>
 
       {/* Content */}
-      <DialogContent sx={{ p: 3 }}>
+      <DialogContent sx={{ p: 3, backgroundColor: '#FFFFFF' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           
           {/* Type of Court */}
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
               Type of Court
             </Typography>
             <Grid container spacing={4}>
               <Grid item xs={6}>
                 <FormControl component="fieldset">
-                  <FormLabel component="legend" sx={{ fontWeight: 'bold', color: '#333' }}>
+                  <FormLabel component="legend" sx={{ fontWeight: 'bold', color: '#1A2B47' }}>
                     Circuit
                   </FormLabel>
                   <RadioGroup
                     value={formData.circuitCourt}
                     onChange={(e) => handleInputChange('circuitCourt', e.target.value)}
+                    sx={formControlStyles}
                   >
                     <FormControlLabel value="civil" control={<Radio />} label="Civil" />
                     <FormControlLabel value="family" control={<Radio />} label="Family" />
@@ -205,12 +256,13 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
               </Grid>
               <Grid item xs={6}>
                 <FormControl component="fieldset">
-                  <FormLabel component="legend" sx={{ fontWeight: 'bold', color: '#333' }}>
+                  <FormLabel component="legend" sx={{ fontWeight: 'bold', color: '#1A2B47' }}>
                     County
                   </FormLabel>
                   <RadioGroup
                     value={formData.countyCourt}
                     onChange={(e) => handleInputChange('countyCourt', e.target.value)}
+                    sx={formControlStyles}
                   >
                     <FormControlLabel value="civil" control={<Radio />} label="Civil" />
                     <FormControlLabel value="smallClaims" control={<Radio />} label="Small Claims" />
@@ -224,13 +276,14 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
 
           {/* Related Cases */}
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
               Related Cases?
             </Typography>
             <RadioGroup
               value={formData.relatedCases}
               onChange={(e) => handleInputChange('relatedCases', e.target.value)}
               row
+              sx={formControlStyles}
             >
               <FormControlLabel value="no" control={<Radio />} label="No" />
               <FormControlLabel value="yes" control={<Radio />} label="Yes" />
@@ -241,10 +294,10 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
 
           {/* Remedies Sought */}
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
               Remedies Sought (Check All that Apply)
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, ...formControlStyles }}>
               <FormControlLabel
                 control={
                   <Checkbox
@@ -289,36 +342,39 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
           {/* Class Action, Jury Trial, Counts */}
           <Grid container spacing={3}>
             <Grid item xs={4}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
                 Class Action?
               </Typography>
               <RadioGroup
                 value={formData.classAction}
                 onChange={(e) => handleInputChange('classAction', e.target.value)}
+                sx={formControlStyles}
               >
                 <FormControlLabel value="no" control={<Radio />} label="No" />
                 <FormControlLabel value="yes" control={<Radio />} label="Yes" />
               </RadioGroup>
             </Grid>
             <Grid item xs={4}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
                 Jury Trial Demanded?
               </Typography>
               <RadioGroup
                 value={formData.juryTrial}
                 onChange={(e) => handleInputChange('juryTrial', e.target.value)}
+                sx={formControlStyles}
               >
                 <FormControlLabel value="yes" control={<Radio />} label="Yes" />
                 <FormControlLabel value="no" control={<Radio />} label="No" />
               </RadioGroup>
             </Grid>
             <Grid item xs={4}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
                 Complex Business Court Indicator
               </Typography>
               <RadioGroup
                 value={formData.complexBusiness}
                 onChange={(e) => handleInputChange('complexBusiness', e.target.value)}
+                sx={formControlStyles}
               >
                 <FormControlLabel value="no" control={<Radio />} label="No" />
                 <FormControlLabel value="yes" control={<Radio />} label="Yes" />
@@ -331,7 +387,7 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
           {/* Counts */}
           <Grid container spacing={3}>
             <Grid item xs={4}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
                 Causes of Action?
               </Typography>
               <Select
@@ -339,6 +395,28 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
                 onChange={(e) => handleInputChange('causesOfAction', e.target.value)}
                 fullWidth
                 size="small"
+                sx={{
+                  ...formControlStyles,
+                  '& .MuiSelect-select': {
+                    color: '#1A2B47',
+                    fontSize: '14px',
+                  },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      '& .MuiMenuItem-root': {
+                        color: '#1A2B47',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        },
+                      },
+                    },
+                  },
+                }}
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                   <MenuItem key={num} value={num}>{num}</MenuItem>
@@ -346,7 +424,7 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
               </Select>
             </Grid>
             <Grid item xs={4}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
                 Defendants?
               </Typography>
               <Select
@@ -354,6 +432,28 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
                 onChange={(e) => handleInputChange('defendants', e.target.value)}
                 fullWidth
                 size="small"
+                sx={{
+                  ...formControlStyles,
+                  '& .MuiSelect-select': {
+                    color: '#1A2B47',
+                    fontSize: '14px',
+                  },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      '& .MuiMenuItem-root': {
+                        color: '#1A2B47',
+                        '&:hover': {
+                          backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                        },
+                        '&.Mui-selected': {
+                          backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                        },
+                      },
+                    },
+                  },
+                }}
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                   <MenuItem key={num} value={num}>{num}</MenuItem>
@@ -361,7 +461,7 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
               </Select>
             </Grid>
             <Grid item xs={4}>
-              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
                 Subpoenas?
               </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -370,12 +470,34 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
                   onChange={(e) => handleInputChange('subpoenas', e.target.value)}
                   fullWidth
                   size="small"
+                  sx={{
+                    ...formControlStyles,
+                    '& .MuiSelect-select': {
+                      color: '#1A2B47',
+                      fontSize: '14px',
+                    },
+                  }}
+                  MenuProps={{
+                    PaperProps: {
+                      sx: {
+                        '& .MuiMenuItem-root': {
+                          color: '#1A2B47',
+                          '&:hover': {
+                            backgroundColor: 'rgba(255, 215, 0, 0.1)',
+                          },
+                          '&.Mui-selected': {
+                            backgroundColor: 'rgba(255, 215, 0, 0.2)',
+                          },
+                        },
+                      },
+                    },
+                  }}
                 >
                   {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                     <MenuItem key={num} value={num}>{num}</MenuItem>
                   ))}
                 </Select>
-                <Typography variant="caption" sx={{ color: '#666' }}>
+                <Typography variant="caption" sx={{ color: '#1A2B47' }}>
                   Not Summons
                 </Typography>
               </Box>
@@ -386,10 +508,10 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
 
           {/* Type of Case */}
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
               Type of Case
             </Typography>
-            <Grid container spacing={2}>
+            <Grid container spacing={2} sx={formControlStyles}>
               {caseTypes.map((caseType, index) => (
                 <Grid item xs={6} key={caseType}>
                   <FormControlLabel
@@ -425,6 +547,7 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
                       placeholder="Specify case type"
                       error={!!errors.otherCaseType}
                       helperText={errors.otherCaseType}
+                      sx={formControlStyles}
                     />
                   </Box>
                 )}
@@ -441,7 +564,7 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
                 variant="h6" 
                 sx={{ 
                   fontWeight: 'bold', 
-                  color: errors.claimAmount ? '#d32f2f' : '#333' 
+                  color: errors.claimAmount ? '#d32f2f' : '#1A2B47' 
                 }}
               >
                 {errors.claimAmount || 'Please Enter Claim Amount'}
@@ -451,7 +574,18 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
                 value={formData.claimAmount}
                 onChange={(e) => handleInputChange('claimAmount', parseInt(e.target.value) || 0)}
                 size="small"
-                sx={{ width: '150px' }}
+                sx={{ 
+                  width: '150px', 
+                  ...formControlStyles,
+                  '& .MuiInputBase-input': {
+                    color: '#1A2B47',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                  },
+                  '& .MuiOutlinedInput-input': {
+                    color: '#1A2B47',
+                  },
+                }}
                 error={!!errors.claimAmount}
               />
             </Box>
@@ -465,7 +599,8 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
           p: 3,
           pt: 2,
           justifyContent: 'flex-end',
-          borderTop: '1px solid #e0e0e0',
+          borderTop: '1px solid #FFD700',
+          backgroundColor: '#FFFFFF',
         }}
       >
         <Button
@@ -477,12 +612,13 @@ const NewCaseModal = ({ open, onClose, onContinue }) => {
             fontWeight: '600',
             px: 4,
             py: 1.5,
-            backgroundColor: '#1976d2',
+            backgroundColor: '#FFD700',
+            color: '#1A2B47',
             borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(25, 118, 210, 0.3)',
+            boxShadow: '0 2px 4px rgba(255, 215, 0, 0.3)',
             '&:hover': {
-              backgroundColor: '#1565c0',
-              boxShadow: '0 4px 8px rgba(25, 118, 210, 0.4)',
+              backgroundColor: '#E6C200',
+              boxShadow: '0 4px 8px rgba(255, 215, 0, 0.4)',
             },
           }}
         >

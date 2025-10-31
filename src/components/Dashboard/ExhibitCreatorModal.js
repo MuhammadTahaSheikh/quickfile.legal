@@ -37,6 +37,36 @@ import NewCaseModal from './NewCaseModal';
 
 const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
   const fileInputRef = useRef(null);
+  
+  const formControlStyles = {
+    '& .MuiFormControlLabel-label': {
+      color: '#1A2B47',
+    },
+    '& .MuiRadio-root': {
+      color: '#FFD700',
+      '&.Mui-checked': {
+        color: '#FFD700',
+      },
+    },
+    '& .MuiCheckbox-root': {
+      color: '#FFD700',
+      '&.Mui-checked': {
+        color: '#FFD700',
+      },
+    },
+    '& .MuiInputBase-input': {
+      color: '#1A2B47',
+    },
+    '& .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#FFD700',
+    },
+    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#E6C200',
+    },
+    '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+      borderColor: '#FFD700',
+    },
+  };
   const [exhibitIdentifier, setExhibitIdentifier] = useState('letters');
   const [separateExhibits, setSeparateExhibits] = useState(false);
   const [exhibits, setExhibits] = useState([]);
@@ -138,6 +168,8 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
           boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
           minHeight: '600px',
           maxHeight: '90vh',
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #FFD700',
         }
       }}
     >
@@ -149,8 +181,8 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
           justifyContent: 'space-between',
           py: 2,
           px: 3,
-          borderBottom: '1px solid #e0e0e0',
-          backgroundColor: '#f8f9fa',
+          borderBottom: '1px solid #FFD700',
+          backgroundColor: '#1A2B47',
         }}
       >
         <Typography
@@ -158,7 +190,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
           sx={{
             fontWeight: 'bold',
             fontSize: '20px',
-            color: '#333',
+            color: '#FFFFFF',
           }}
         >
           Exhibit Creator
@@ -167,10 +199,10 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
           onClick={onClose}
           size="small"
           sx={{
-            color: '#666',
+            color: '#FFD700',
             '&:hover': {
-              backgroundColor: '#f5f5f5',
-              color: '#333',
+              backgroundColor: 'rgba(255, 215, 0, 0.1)',
+              color: '#E6C200',
             },
           }}
         >
@@ -184,15 +216,15 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
         <Box sx={{ 
           width: '300px', 
           p: 3, 
-          borderRight: '1px solid #e0e0e0',
-          backgroundColor: '#f8f9fa',
+          borderRight: '1px solid #FFD700',
+          backgroundColor: '#FFFFFF',
           display: 'flex',
           flexDirection: 'column',
           gap: 3,
         }}>
           {/* Main Document */}
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#333' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#1A2B47' }}>
               Main Document
             </Typography>
             <TextField
@@ -203,20 +235,22 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
               sx={{
                 '& .MuiInputBase-input': {
                   fontSize: '14px',
-                  color: '#666',
+                  color: '#1A2B47',
                 },
+                ...formControlStyles,
               }}
             />
           </Box>
 
           {/* Exhibit Identifier */}
           <FormControl component="fieldset">
-            <FormLabel component="legend" sx={{ fontWeight: 'bold', color: '#333', mb: 1 }}>
+            <FormLabel component="legend" sx={{ fontWeight: 'bold', color: '#1A2B47', mb: 1 }}>
               Exhibit Identifier
             </FormLabel>
             <RadioGroup
               value={exhibitIdentifier}
               onChange={handleIdentifierChange}
+              sx={formControlStyles}
             >
               <FormControlLabel 
                 value="numbers" 
@@ -241,7 +275,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
 
           {/* Process */}
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#333' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#1A2B47' }}>
               Process
             </Typography>
             <Button
@@ -255,11 +289,11 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
                 fontSize: '14px',
                 fontWeight: '600',
                 py: 1,
-                borderColor: '#1976d2',
-                color: '#1976d2',
+                borderColor: '#FFD700',
+                color: '#FFD700',
                 '&:hover': {
-                  borderColor: '#1565c0',
-                  backgroundColor: '#e3f2fd',
+                  borderColor: '#E6C200',
+                  backgroundColor: 'rgba(255, 215, 0, 0.1)',
                 },
                 '&:disabled': {
                   borderColor: '#ccc',
@@ -274,7 +308,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
 
           {/* Efile Options */}
           <Box>
-            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#333' }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, color: '#1A2B47' }}>
               Efile Options
             </Typography>
             <FormControlLabel
@@ -286,24 +320,25 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
                 />
               }
               label="Separate Exhibits"
-              sx={{ fontSize: '14px' }}
+              sx={{ fontSize: '14px', ...formControlStyles }}
             />
           </Box>
         </Box>
 
         {/* Right Column - Exhibit Order */}
-        <Box sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column' }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2, color: '#333' }}>
+        <Box sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column', backgroundColor: '#FFFFFF' }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2, color: '#1A2B47' }}>
             Exhibit Order
           </Typography>
           
           <Paper
             sx={{
               flex: 1,
-              border: '1px solid #e0e0e0',
+              border: '1px solid #FFD700',
               borderRadius: '4px',
               overflow: 'hidden',
               display: 'flex',
+              backgroundColor: '#FFFFFF',
             }}
           >
             {/* Exhibit List */}
@@ -317,9 +352,9 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
                           py: 1,
                           px: 2,
                           cursor: 'pointer',
-                          backgroundColor: selectedExhibit?.id === exhibit.id ? '#e3f2fd' : 'transparent',
+                          backgroundColor: selectedExhibit?.id === exhibit.id ? 'rgba(255, 215, 0, 0.1)' : 'transparent',
                           '&:hover': {
-                            backgroundColor: selectedExhibit?.id === exhibit.id ? '#e3f2fd' : '#f5f5f5',
+                            backgroundColor: selectedExhibit?.id === exhibit.id ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255, 215, 0, 0.05)',
                           },
                         }}
                         onClick={() => setSelectedExhibit(exhibit)}
@@ -327,11 +362,20 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
                         <ListItemText
                           primary={
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
+                              <Typography variant="body2" sx={{ 
+                                fontWeight: 'medium',
+                                color: '#1A2B47',
+                                fontSize: '14px'
+                              }}>
                                 {exhibit.identifier && `${exhibit.identifier}. `}{exhibit.name}
                               </Typography>
                             </Box>
                           }
+                          sx={{
+                            '& .MuiListItemText-primary': {
+                              color: '#1A2B47',
+                            }
+                          }}
                         />
                         <ListItemSecondaryAction>
                           <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -343,7 +387,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
                               }}
                               disabled={index === 0}
                               sx={{ 
-                                color: '#1976d2',
+                                color: '#FFD700',
                                 '&:disabled': { color: '#ccc' }
                               }}
                             >
@@ -357,7 +401,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
                               }}
                               disabled={index === exhibits.length - 1}
                               sx={{ 
-                                color: '#1976d2',
+                                color: '#FFD700',
                                 '&:disabled': { color: '#ccc' }
                               }}
                             >
@@ -383,10 +427,10 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
                   }}
                 >
                   <Description sx={{ fontSize: 48, mb: 2, opacity: 0.3 }} />
-                  <Typography variant="body2">
+                  <Typography variant="body2" sx={{ color: '#1A2B47' }}>
                     No exhibits added yet
                   </Typography>
-                  <Typography variant="caption">
+                  <Typography variant="caption" sx={{ color: '#1A2B47' }}>
                     Click "Attach Files" to add exhibits
                   </Typography>
                 </Box>
@@ -420,7 +464,8 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
           pt: 2,
           gap: 2,
           justifyContent: 'space-between',
-          borderTop: '1px solid #e0e0e0',
+          borderTop: '1px solid #FFD700',
+          backgroundColor: '#FFFFFF',
         }}
       >
         <Button
@@ -432,11 +477,11 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
             fontWeight: '600',
             px: 3,
             py: 1,
-            borderColor: '#6c757d',
-            color: '#6c757d',
+            borderColor: '#1A2B47',
+            color: '#1A2B47',
             '&:hover': {
-              borderColor: '#5a6268',
-              backgroundColor: '#f8f9fa',
+              borderColor: '#0F1A2F',
+              backgroundColor: 'rgba(26, 43, 71, 0.1)',
             },
           }}
         >
@@ -454,11 +499,11 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
               fontWeight: '600',
               px: 3,
               py: 1,
-              borderColor: '#28a745',
-              color: '#28a745',
+              borderColor: '#FFD700',
+              color: '#FFD700',
               '&:hover': {
-                borderColor: '#218838',
-                backgroundColor: '#d4edda',
+                borderColor: '#E6C200',
+                backgroundColor: 'rgba(255, 215, 0, 0.1)',
               },
             }}
           >
@@ -502,11 +547,11 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
               fontWeight: '600',
               px: 3,
               py: 1,
-              borderColor: '#17a2b8',
-              color: '#17a2b8',
+              borderColor: '#1A2B47',
+              color: '#1A2B47',
               '&:hover': {
-                borderColor: '#138496',
-                backgroundColor: '#d1ecf1',
+                borderColor: '#0F1A2F',
+                backgroundColor: 'rgba(26, 43, 71, 0.1)',
               },
               '&:disabled': {
                 borderColor: '#ccc',
