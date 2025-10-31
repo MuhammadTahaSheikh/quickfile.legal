@@ -1,9 +1,23 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Replace these with your actual Supabase project URL and anon key
-// You can find these in your Supabase project settings
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'YOUR_SUPABASE_URL'
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY'
+// Get environment variables
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY
+
+// Validate that environment variables are set
+if (!supabaseUrl || supabaseUrl === 'YOUR_SUPABASE_URL' || !supabaseUrl.startsWith('http')) {
+  throw new Error(
+    'Missing or invalid REACT_APP_SUPABASE_URL environment variable. ' +
+    'Please set it in your Vercel environment variables.'
+  )
+}
+
+if (!supabaseAnonKey || supabaseAnonKey === 'YOUR_SUPABASE_ANON_KEY') {
+  throw new Error(
+    'Missing or invalid REACT_APP_SUPABASE_ANON_KEY environment variable. ' +
+    'Please set it in your Vercel environment variables.'
+  )
+}
 
 // Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
