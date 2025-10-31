@@ -1,6 +1,34 @@
 import { supabase } from './supabase';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+// Get API URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
+
+// Validate API URL - in production, it must be set
+if (process.env.NODE_ENV === 'production') {
+  if (!API_URL || API_URL === 'http://localhost:5001' || !API_URL.startsWith('http')) {
+    console.error('REACT_APP_API_URL is missing or invalid in production. Please set it in Vercel environment variables.');
+  }
+}
+
+// Fallback to localhost only in development
+const getApiUrl = () => {
+  return API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : '');
+};
+
+/**
+ * Fetch with timeout to prevent hanging requests
+ * @param {string} url - The URL to fetch
+ * @param {object} options - Fetch options
+ * @param {number} timeout - Timeout in milliseconds (default: 30000 = 30 seconds)
+ */
+const fetchWithTimeout = (url, options = {}, timeout = 30000) => {
+  return Promise.race([
+    fetch(url, options),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Connection timeout: Backend server is not responding. Please check if the backend is running.')), timeout)
+    )
+  ]);
+};
 
 /**
  * Get all users (admin only)
@@ -21,7 +49,12 @@ export const getAllUsers = async () => {
     }
 
     // Call the backend API
-    const response = await fetch(`${API_URL}/api/users`, {
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+    }
+    
+    const response = await fetchWithTimeout(`${apiUrl}/api/users`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -30,7 +63,12 @@ export const getAllUsers = async () => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
       throw new Error(errorData.error || 'Failed to fetch users');
     }
 
@@ -42,6 +80,16 @@ export const getAllUsers = async () => {
     };
   } catch (error) {
     console.error('Error fetching users:', error);
+    
+    // Check if it's a connection/timeout error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        success: false, 
+        error: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.',
+        users: []
+      };
+    }
+    
     return { 
       success: false, 
       error: error.message,
@@ -68,7 +116,12 @@ export const getUserStats = async () => {
       throw new Error('No access token available');
     }
 
-    const response = await fetch(`${API_URL}/api/users/stats`, {
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+    }
+    
+    const response = await fetchWithTimeout(`${apiUrl}/api/users/stats`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -77,7 +130,12 @@ export const getUserStats = async () => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
       throw new Error(errorData.error || 'Failed to fetch stats');
     }
 
@@ -89,6 +147,21 @@ export const getUserStats = async () => {
     };
   } catch (error) {
     console.error('Error fetching stats:', error);
+    
+    // Check if it's a connection/timeout error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        success: false, 
+        error: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.',
+        stats: {
+          total_users: 0,
+          confirmed_users: 0,
+          unconfirmed_users: 0,
+          confirmed_today: 0
+        }
+      };
+    }
+    
     return { 
       success: false, 
       error: error.message,
@@ -120,7 +193,12 @@ export const searchUsersByEmail = async (email) => {
       throw new Error('No access token available');
     }
 
-    const response = await fetch(`${API_URL}/api/users/search?email=${encodeURIComponent(email)}`, {
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+    }
+    
+    const response = await fetchWithTimeout(`${apiUrl}/api/users/search?email=${encodeURIComponent(email)}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -129,7 +207,12 @@ export const searchUsersByEmail = async (email) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
       throw new Error(errorData.error || 'Failed to search users');
     }
 
@@ -141,6 +224,16 @@ export const searchUsersByEmail = async (email) => {
     };
   } catch (error) {
     console.error('Error searching users:', error);
+    
+    // Check if it's a connection/timeout error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        success: false, 
+        error: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.',
+        users: []
+      };
+    }
+    
     return { 
       success: false, 
       error: error.message,
@@ -171,7 +264,12 @@ export const updateUserRole = async (userId, newRole) => {
       throw new Error('Invalid role');
     }
 
-    const response = await fetch(`${API_URL}/api/users/${userId}/role`, {
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+    }
+    
+    const response = await fetchWithTimeout(`${apiUrl}/api/users/${userId}/role`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -181,7 +279,12 @@ export const updateUserRole = async (userId, newRole) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
       throw new Error(errorData.error || 'Failed to update user role');
     }
 
@@ -193,6 +296,15 @@ export const updateUserRole = async (userId, newRole) => {
     };
   } catch (error) {
     console.error('Error updating user role:', error);
+    
+    // Check if it's a connection/timeout error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        success: false, 
+        error: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.'
+      };
+    }
+    
     return { 
       success: false, 
       error: error.message 
@@ -205,7 +317,16 @@ export const updateUserRole = async (userId, newRole) => {
  */
 export const checkBackendHealth = async () => {
   try {
-    const response = await fetch(`${API_URL}/api/health`);
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      return { 
+        status: 'error', 
+        message: 'API URL is not configured. Please set REACT_APP_API_URL in your environment variables.' 
+      };
+    }
+    
+    // Use timeout for health check (15 seconds - faster for health check but still reasonable for slow networks)
+    const response = await fetchWithTimeout(`${apiUrl}/api/health`, {}, 15000);
     
     if (!response.ok) {
       return { status: 'error', message: 'Backend not responding' };
@@ -235,9 +356,19 @@ export const checkBackendHealth = async () => {
     };
   } catch (error) {
     console.error('Health check error:', error);
+    
+    // Check if it's a connection error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        status: 'error', 
+        message: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.',
+        error: error.message
+      };
+    }
+    
     return { 
       status: 'error', 
-      message: 'Backend server not running. Please start the backend server on port 5000.',
+      message: 'Backend server not running. Please start the backend server.',
       error: error.message
     };
   }
@@ -262,19 +393,35 @@ export const uploadFile = async (file, userId) => {
     }
 
     // Create FormData
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+    }
+
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_URL}/api/upload`, {
+    // Use longer timeout for file uploads (60 seconds - files can be large and networks can be slow)
+    const response = await fetchWithTimeout(`${apiUrl}/api/upload`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
       },
       body: formData,
-    });
+    }, 60000);
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        // If response is not JSON (e.g., HTML error page), extract status info
+        const errorText = await response.text().catch(() => '');
+        if (errorText.startsWith('<!DOCTYPE')) {
+          throw new Error(`Server error (${response.status} ${response.statusText}). The API server may not be running or configured correctly.`);
+        }
+        errorData = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
       throw new Error(errorData.error || 'Failed to upload file');
     }
 
@@ -286,6 +433,15 @@ export const uploadFile = async (file, userId) => {
     };
   } catch (error) {
     console.error('Error uploading file:', error);
+    
+    // Check if it's a connection/timeout error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        success: false, 
+        error: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.'
+      };
+    }
+    
     return { 
       success: false, 
       error: error.message 
@@ -311,7 +467,12 @@ export const getUserFiles = async (userId) => {
       throw new Error('No access token available');
     }
 
-    const response = await fetch(`${API_URL}/api/upload/files/${encodeURIComponent(userId)}`, {
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+    }
+    
+    const response = await fetchWithTimeout(`${apiUrl}/api/upload/files/${encodeURIComponent(userId)}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -320,7 +481,12 @@ export const getUserFiles = async (userId) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
       throw new Error(errorData.error || 'Failed to fetch files');
     }
 
@@ -332,6 +498,16 @@ export const getUserFiles = async (userId) => {
     };
   } catch (error) {
     console.error('Error fetching files:', error);
+    
+    // Check if it's a connection/timeout error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        success: false, 
+        error: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.',
+        files: []
+      };
+    }
+    
     return { 
       success: false, 
       error: error.message,
@@ -358,7 +534,12 @@ export const deleteFile = async (userId, filename) => {
       throw new Error('No access token available');
     }
 
-    const response = await fetch(`${API_URL}/api/upload/files/${encodeURIComponent(userId)}/${encodeURIComponent(filename)}`, {
+    const apiUrl = getApiUrl();
+    if (!apiUrl) {
+      throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+    }
+    
+    const response = await fetchWithTimeout(`${apiUrl}/api/upload/files/${encodeURIComponent(userId)}/${encodeURIComponent(filename)}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${session.access_token}`,
@@ -367,7 +548,12 @@ export const deleteFile = async (userId, filename) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (e) {
+        errorData = { error: `Server error: ${response.status} ${response.statusText}` };
+      }
       throw new Error(errorData.error || 'Failed to delete file');
     }
 
@@ -379,6 +565,15 @@ export const deleteFile = async (userId, filename) => {
     };
   } catch (error) {
     console.error('Error deleting file:', error);
+    
+    // Check if it's a connection/timeout error
+    if (error.message.includes('timeout') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      return { 
+        success: false, 
+        error: 'Cannot connect to backend server. Please check if the backend is running and REACT_APP_API_URL is configured correctly.'
+      };
+    }
+    
     return { 
       success: false, 
       error: error.message 

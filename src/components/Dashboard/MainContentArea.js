@@ -26,7 +26,7 @@ import {
 } from '@mui/icons-material';
 import EFileModal from './EFileModal';
 import ExhibitCreatorModal from './ExhibitCreatorModal';
-import { uploadFile, getUserFiles, deleteFile, checkBackendHealth } from '../../lib/backendApi';
+import { uploadFile, getUserFiles, deleteFile } from '../../lib/backendApi';
 import { supabase } from '../../lib/supabase';
 
 const MainContentArea = forwardRef(({ user }, ref) => {
@@ -127,63 +127,35 @@ const MainContentArea = forwardRef(({ user }, ref) => {
 
       console.log('Using userId:', userId);
 
-      // Check backend health to decide whether to upload or queue offline
-      const health = await checkBackendHealth();
-      const backendOk = health?.status === 'ok';
+      // Upload files to backend
+      const uploadPromises = files.map(async (file) => {
+        const result = await uploadFile(file, userId);
+        if (result.success) {
+          return {
+            id: nextId + files.indexOf(file),
+            name: file.name,
+            status: 'Ready to File',
+            size: formatFileSize(file.size),
+            type: getFileType(file.name),
+            file: file,
+            uploadDate: new Date().toISOString(),
+            backendPath: result.file.path,
+            backendFilename: result.file.filename,
+          };
+        } else {
+          throw new Error(result.error || 'Upload failed');
+        }
+      });
 
-      if (!backendOk) {
-        // Queue files locally without uploading
-        const queuedFiles = files.map((file, index) => ({
-          id: nextId + index,
-          name: file.name,
-          status: 'Queued (offline)',
-          size: formatFileSize(file.size),
-          type: getFileType(file.name),
-          file: file,
-          uploadDate: new Date().toISOString(),
-          backendPath: null,
-          backendFilename: null,
-          offlineQueued: true,
-        }));
+      const newFiles = await Promise.all(uploadPromises);
 
-        setProcessQueue(prev => [...prev, ...queuedFiles]);
-        setNextId(prev => prev + files.length);
-        setSnackbar({
-          open: true,
-          message: `${files.length} file(s) added to process queue (backend offline)`,
-          severity: 'warning'
-        });
-      } else {
-        // Upload files to backend
-        const uploadPromises = files.map(async (file) => {
-          const result = await uploadFile(file, userId);
-          if (result.success) {
-            return {
-              id: nextId + files.indexOf(file),
-              name: file.name,
-              status: 'Ready to File',
-              size: formatFileSize(file.size),
-              type: getFileType(file.name),
-              file: file,
-              uploadDate: new Date().toISOString(),
-              backendPath: result.file.path,
-              backendFilename: result.file.filename,
-            };
-          } else {
-            throw new Error(result.error || 'Upload failed');
-          }
-        });
-
-        const newFiles = await Promise.all(uploadPromises);
-
-        setProcessQueue(prev => [...prev, ...newFiles]);
-        setNextId(prev => prev + files.length);
-        setSnackbar({
-          open: true,
-          message: `${files.length} file(s) added to process queue and uploaded to server`,
-          severity: 'success'
-        });
-      }
+      setProcessQueue(prev => [...prev, ...newFiles]);
+      setNextId(prev => prev + files.length);
+      setSnackbar({
+        open: true,
+        message: `${files.length} file(s) added to process queue and uploaded to server`,
+        severity: 'success'
+      });
     } catch (error) {
       console.error('Error uploading files:', error);
       setSnackbar({
@@ -248,7 +220,13 @@ const MainContentArea = forwardRef(({ user }, ref) => {
           throw new Error('No access token available');
         }
 
-        const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/upload/files/${user.id}/${encodeURIComponent(file.backendFilename)}`;
+        // Get API URL - same logic as backendApi
+        const apiUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : '');
+        if (!apiUrl) {
+          throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
+        }
+        
+        const downloadUrl = `${apiUrl}/api/upload/files/${user.id}/${encodeURIComponent(file.backendFilename)}`;
         
         // Fetch the file with auth token
         const response = await fetch(downloadUrl, {
@@ -334,8 +312,6 @@ const MainContentArea = forwardRef(({ user }, ref) => {
         return <CheckCircle color="success" />;
       case 'Processing':
         return <CloudUpload color="warning" />;
-      case 'Queued (offline)':
-        return <Warning color="warning" />;
       case 'Completed':
         return <CheckCircle color="success" />;
       default:
@@ -349,8 +325,6 @@ const MainContentArea = forwardRef(({ user }, ref) => {
         return '#4caf50';
       case 'Processing':
         return '#ff9800';
-      case 'Queued (offline)':
-        return '#f57c00';
       case 'Completed':
         return '#2196f3';
       default:
