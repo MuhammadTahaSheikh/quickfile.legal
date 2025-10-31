@@ -26,7 +26,9 @@ import {
 } from '@mui/icons-material';
 import EFileModal from './EFileModal';
 import ExhibitCreatorModal from './ExhibitCreatorModal';
-import { uploadFile, getUserFiles, deleteFile } from '../../lib/backendApi';
+// import { uploadFile, getUserFiles, deleteFile } from '../../lib/backendApi';
+import { getUserFiles, deleteFile } from '../../lib/backendApi';
+// uploadFile is commented out - backend upload functionality disabled
 import { supabase } from '../../lib/supabase';
 
 const MainContentArea = forwardRef(({ user }, ref) => {
@@ -127,6 +129,8 @@ const MainContentArea = forwardRef(({ user }, ref) => {
 
       console.log('Using userId:', userId);
 
+      // COMMENTED OUT: Upload files to backend
+      /*
       // Upload files to backend
       const uploadPromises = files.map(async (file) => {
         const result = await uploadFile(file, userId);
@@ -148,6 +152,20 @@ const MainContentArea = forwardRef(({ user }, ref) => {
       });
 
       const newFiles = await Promise.all(uploadPromises);
+      */
+      
+      // Local file handling without backend upload
+      const newFiles = files.map((file, index) => ({
+        id: nextId + index,
+        name: file.name,
+        status: 'Ready to File',
+        size: formatFileSize(file.size),
+        type: getFileType(file.name),
+        file: file,
+        uploadDate: new Date().toISOString(),
+        backendPath: null,
+        backendFilename: null,
+      }));
 
       setProcessQueue(prev => [...prev, ...newFiles]);
       setNextId(prev => prev + files.length);
@@ -220,13 +238,7 @@ const MainContentArea = forwardRef(({ user }, ref) => {
           throw new Error('No access token available');
         }
 
-        // Get API URL - same logic as backendApi
-        const apiUrl = process.env.REACT_APP_API_URL || (process.env.NODE_ENV === 'development' ? 'http://localhost:5001' : '');
-        if (!apiUrl) {
-          throw new Error('API URL is not configured. Please set REACT_APP_API_URL in your environment variables.');
-        }
-        
-        const downloadUrl = `${apiUrl}/api/upload/files/${user.id}/${encodeURIComponent(file.backendFilename)}`;
+        const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/upload/files/${user.id}/${encodeURIComponent(file.backendFilename)}`;
         
         // Fetch the file with auth token
         const response = await fetch(downloadUrl, {
