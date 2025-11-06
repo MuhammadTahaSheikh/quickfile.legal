@@ -33,10 +33,16 @@ const AdminUserList = () => {
       setLoading(true);
       setError(null);
       const data = await getAllUsers();
-      setUsers(data.users || []);
+      if (!data.success && data.error) {
+        setError(data.error);
+        setUsers([]);
+      } else {
+        setUsers(data.users || []);
+      }
     } catch (err) {
       console.error('Error fetching users:', err);
       setError(err.message);
+      setUsers([]);
     } finally {
       setLoading(false);
     }
@@ -45,9 +51,27 @@ const AdminUserList = () => {
   const fetchStats = async () => {
     try {
       const data = await getUserStats();
-      setStats(data.stats);
+      if (data.success && data.stats) {
+        setStats(data.stats);
+      } else {
+        // Use default stats if fetch fails
+        setStats({
+          total_users: 0,
+          admin_count: 0,
+          confirmed_users: 0,
+          unconfirmed_users: 0,
+          confirmed_today: 0
+        });
+      }
     } catch (err) {
       console.error('Error fetching stats:', err);
+      setStats({
+        total_users: 0,
+        admin_count: 0,
+        confirmed_users: 0,
+        unconfirmed_users: 0,
+        confirmed_today: 0
+      });
     }
   };
 
@@ -61,10 +85,16 @@ const AdminUserList = () => {
       setLoading(true);
       setError(null);
       const data = await searchUsersByEmail(searchEmail);
-      setUsers(data.users || []);
+      if (!data.success && data.error) {
+        setError(data.error);
+        setUsers([]);
+      } else {
+        setUsers(data.users || []);
+      }
     } catch (err) {
       console.error('Error searching users:', err);
       setError(err.message);
+      setUsers([]);
     } finally {
       setLoading(false);
     }

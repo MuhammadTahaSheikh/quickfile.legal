@@ -14,6 +14,7 @@ import SignUp from './pages/SignUp';
 import Login from './pages/Login';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 import AdminUserList from './components/AdminUserList';
 import AdminRoute from './components/AdminRoute';
 
@@ -43,6 +44,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               } 
             />

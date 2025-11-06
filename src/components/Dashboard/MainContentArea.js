@@ -26,9 +26,7 @@ import {
 } from '@mui/icons-material';
 import EFileModal from './EFileModal';
 import ExhibitCreatorModal from './ExhibitCreatorModal';
-// import { uploadFile, getUserFiles, deleteFile } from '../../lib/backendApi';
-import { getUserFiles, deleteFile } from '../../lib/backendApi';
-// uploadFile is commented out - backend upload functionality disabled
+import { getUserFiles, deleteFile, getFileUrl, uploadFileToStorage, saveDocumentToDatabase } from '../../lib/supabaseDatabase';
 import { supabase } from '../../lib/supabase';
 
 const MainContentArea = forwardRef(({ user }, ref) => {
@@ -83,18 +81,19 @@ const MainContentArea = forwardRef(({ user }, ref) => {
         const result = await getUserFiles(userId);
         
         if (result.success && result.files.length > 0) {
-          // Convert backend file data to processQueue format
+          // Convert Supabase file data to processQueue format
           const loadedFiles = result.files.map((file, index) => ({
             id: Date.now() + index,
-            name: file.filename.split('_').slice(0, -1).join('_') || file.filename, // Remove timestamp
+            name: file.original_filename || file.filename,
             status: 'Ready to File',
             size: formatFileSize(file.size),
             type: getFileType(file.filename),
-            file: null, // No file object for backend files
+            file: null, // No file object for loaded files
             uploadDate: new Date(file.uploadDate).toISOString(),
-            backendPath: file.path || null,
-            backendFilename: file.filename,
-            loadedFromBackend: true
+            filePath: file.path || null,
+            fileUrl: file.fileUrl || null,
+            filename: file.filename,
+            loadedFromSupabase: true
           }));
 
           setProcessQueue(loadedFiles);
@@ -119,22 +118,28 @@ const MainContentArea = forwardRef(({ user }, ref) => {
     setIsUploading(true);
     
     try {
-      // Debug: Log user data
-      console.log('User data:', user);
-      console.log('User metadata:', user?.user_metadata);
-      console.log('User email:', user?.email);
-      
-      // Use unique user ID for folder creation
-      const userId = user?.id || 'unknown';
+      if (!user) {
+        throw new Error('You must be logged in to upload files');
+      }
 
-      console.log('Using userId:', userId);
+      const userId = user.id;
 
-      // COMMENTED OUT: Upload files to backend
-      /*
-      // Upload files to backend
+      // Upload files to Supabase Storage
       const uploadPromises = files.map(async (file) => {
-        const result = await uploadFile(file, userId);
+        const result = await uploadFileToStorage(file, userId, 'process-queue');
+        
         if (result.success) {
+          // Also save document metadata to database
+          const docResult = await saveDocumentToDatabase({
+            filename: result.path.split('/').pop(),
+            originalFilename: result.filename,
+            filePath: result.path,
+            fileUrl: result.url,
+            fileSize: result.size,
+            fileType: result.type,
+            documentType: 'process-queue'
+          }, userId);
+
           return {
             id: nextId + files.indexOf(file),
             name: file.name,
@@ -143,8 +148,9 @@ const MainContentArea = forwardRef(({ user }, ref) => {
             type: getFileType(file.name),
             file: file,
             uploadDate: new Date().toISOString(),
-            backendPath: result.file.path,
-            backendFilename: result.file.filename,
+            filePath: result.path,
+            fileUrl: result.url,
+            filename: result.filename,
           };
         } else {
           throw new Error(result.error || 'Upload failed');
@@ -152,26 +158,12 @@ const MainContentArea = forwardRef(({ user }, ref) => {
       });
 
       const newFiles = await Promise.all(uploadPromises);
-      */
-      
-      // Local file handling without backend upload
-      const newFiles = files.map((file, index) => ({
-        id: nextId + index,
-        name: file.name,
-        status: 'Ready to File',
-        size: formatFileSize(file.size),
-        type: getFileType(file.name),
-        file: file,
-        uploadDate: new Date().toISOString(),
-        backendPath: null,
-        backendFilename: null,
-      }));
 
       setProcessQueue(prev => [...prev, ...newFiles]);
       setNextId(prev => prev + files.length);
       setSnackbar({
         open: true,
-        message: `${files.length} file(s) added to process queue and uploaded to server`,
+        message: `${files.length} file(s) uploaded successfully to Supabase`,
         severity: 'success'
       });
     } catch (error) {
@@ -193,9 +185,10 @@ const MainContentArea = forwardRef(({ user }, ref) => {
     try {
       const fileToRemove = processQueue.find(f => f.id === fileId);
       
-      // If file is loaded from backend, delete it from backend
-      if (fileToRemove?.loadedFromBackend && fileToRemove?.backendFilename) {
-        const result = await deleteFile(user.id, fileToRemove.backendFilename);
+      // If file is loaded from Supabase or has a filePath, delete it from Supabase
+      if (fileToRemove?.loadedFromSupabase || fileToRemove?.filePath || fileToRemove?.filename) {
+        const filename = fileToRemove.filename || fileToRemove.name;
+        const result = await deleteFile(user.id, filename);
         
         if (!result.success) {
           setSnackbar({
@@ -229,42 +222,34 @@ const MainContentArea = forwardRef(({ user }, ref) => {
       // Create object URL for file preview (for new uploads)
       const url = URL.createObjectURL(file.file);
       window.open(url, '_blank');
-    } else if (file.loadedFromBackend && file.backendFilename) {
-      // For files loaded from backend, fetch with auth and open
+    } else if (file.loadedFromSupabase || file.filePath) {
+      // For files loaded from Supabase, get signed URL
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const filePath = file.filePath;
         
-        if (!session?.access_token) {
-          throw new Error('No access token available');
+        if (!filePath) {
+          throw new Error('File path not available');
         }
 
-        const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:5001'}/api/upload/files/${user.id}/${encodeURIComponent(file.backendFilename)}`;
+        // Get signed URL from Supabase Storage
+        const urlResult = await getFileUrl(filePath);
         
-        // Fetch the file with auth token
-        const response = await fetch(downloadUrl, {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to download file');
+        if (urlResult.success) {
+          window.open(urlResult.url, '_blank');
+        } else {
+          throw new Error(urlResult.error || 'Failed to get file URL');
         }
-
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-        
-        // Clean up the URL after a delay
-        setTimeout(() => URL.revokeObjectURL(url), 1000);
       } catch (error) {
         console.error('Error opening file:', error);
         setSnackbar({
           open: true,
-          message: 'Error opening file',
+          message: `Error opening file: ${error.message}`,
           severity: 'error'
         });
       }
+    } else if (file.fileUrl) {
+      // If we have a direct public URL, use it
+      window.open(file.fileUrl, '_blank');
     } else {
       setSnackbar({
         open: true,

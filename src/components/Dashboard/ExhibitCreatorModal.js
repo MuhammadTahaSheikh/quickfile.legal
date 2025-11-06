@@ -22,6 +22,9 @@ import {
   Divider,
   Paper,
   InputAdornment,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 import {
   Close,
@@ -32,11 +35,18 @@ import {
   KeyboardArrowUp,
   KeyboardArrowDown,
   AttachFile,
+  CloudUpload,
 } from '@mui/icons-material';
 import NewCaseModal from './NewCaseModal';
+import { saveCompleteSubmission } from '../../lib/supabaseDatabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
   const fileInputRef = useRef(null);
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [caseData, setCaseData] = useState(null);
   
   const formControlStyles = {
     '& .MuiFormControlLabel-label': {
@@ -72,6 +82,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
   const [exhibits, setExhibits] = useState([]);
   const [selectedExhibit, setSelectedExhibit] = useState(null);
   const [newCaseModalOpen, setNewCaseModalOpen] = useState(false);
+  const [confirmSubmitModalOpen, setConfirmSubmitModalOpen] = useState(false);
 
   const handleIdentifierChange = (event) => {
     setExhibitIdentifier(event.target.value);
@@ -86,10 +97,25 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
     setNewCaseModalOpen(true);
   };
 
-  const handleNewCaseContinue = (caseData) => {
-    console.log('New Case Data:', caseData);
-    // After completing the new case form, proceed to file selection
-    fileInputRef.current?.click();
+  const handleNewCaseContinue = (newCaseData) => {
+    console.log('New Case Data:', newCaseData);
+    setCaseData(newCaseData);
+    // After completing the new case form, show confirmation modal instead of file selection
+    setConfirmSubmitModalOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    setConfirmSubmitModalOpen(false);
+    // Submit directly to database
+    await handleSubmit();
+  };
+
+  const handleCancelConfirm = () => {
+    setConfirmSubmitModalOpen(false);
+    // If user cancels, still allow them to add exhibits
+    if (exhibits.length === 0) {
+      fileInputRef.current?.click();
+    }
   };
 
   const handleFileSelect = (event) => {
@@ -153,7 +179,91 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
   };
 
   const handleExit = () => {
+    // Reset state when exiting
+    setCaseData(null);
+    setExhibits([]);
+    setSelectedExhibit(null);
     onClose();
+  };
+
+  const handleSnackbarClose = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      setSnackbar({
+        open: true,
+        message: 'You must be logged in to submit',
+        severity: 'error'
+      });
+      return;
+    }
+
+    if (!mainDocument) {
+      setSnackbar({
+        open: true,
+        message: 'Please select a main document first',
+        severity: 'error'
+      });
+      return;
+    }
+
+    if (!caseData) {
+      setSnackbar({
+        open: true,
+        message: 'Please fill out the case information first by clicking "Attach Files"',
+        severity: 'warning'
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Prepare submission data
+      const submissionData = {
+        mainDocument: {
+          file: mainDocument.file, // File object if it exists
+          name: mainDocument.name
+        },
+        caseData: caseData,
+        exhibits: exhibits.map(exhibit => ({
+          ...exhibit,
+          identifier: exhibit.identifier
+        })),
+        exhibitSettings: {
+          identifier: exhibitIdentifier,
+          separateExhibits: separateExhibits
+        }
+      };
+
+      const result = await saveCompleteSubmission(submissionData, user.id);
+
+      if (result.success) {
+        setSnackbar({
+          open: true,
+          message: 'Document and case information saved successfully!',
+          severity: 'success'
+        });
+        
+        // Reset form and close after a delay
+        setTimeout(() => {
+          handleExit();
+        }, 1500);
+      } else {
+        throw new Error(result.error || 'Failed to save submission');
+      }
+    } catch (error) {
+      console.error('Error submitting:', error);
+      setSnackbar({
+        open: true,
+        message: `Error: ${error.message}`,
+        severity: 'error'
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -457,6 +567,155 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
         onContinue={handleNewCaseContinue}
       />
 
+      {/* Confirmation Modal */}
+      <Dialog
+        open={confirmSubmitModalOpen}
+        onClose={() => setConfirmSubmitModalOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '8px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+            backgroundColor: '#FFFFFF',
+            border: '1px solid #FFD700',
+          }
+        }}
+      >
+        <DialogTitle
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            py: 2,
+            px: 3,
+            borderBottom: '1px solid #FFD700',
+            backgroundColor: '#1A2B47',
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 'bold',
+              fontSize: '20px',
+              color: '#FFFFFF',
+            }}
+          >
+            Confirm Submission
+          </Typography>
+          <IconButton
+            onClick={() => setConfirmSubmitModalOpen(false)}
+            size="small"
+            sx={{
+              color: '#FFD700',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 215, 0, 0.1)',
+              },
+            }}
+          >
+            <Close />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ p: 3, backgroundColor: '#FFFFFF' }}>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: '16px',
+              color: '#1A2B47',
+              lineHeight: 1.6,
+            }}
+          >
+            Do you want to submit this case information and documents to the database?
+          </Typography>
+          {exhibits.length === 0 && (
+            <Typography
+              variant="body2"
+              sx={{
+                fontSize: '14px',
+                color: '#666',
+                mt: 2,
+                fontStyle: 'italic',
+              }}
+            >
+              Note: No exhibits have been added yet. You can add exhibits later if needed.
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions
+          sx={{
+            p: 3,
+            pt: 2,
+            gap: 2,
+            justifyContent: 'flex-end',
+            borderTop: '1px solid #FFD700',
+            backgroundColor: '#FFFFFF',
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleCancelConfirm}
+            sx={{
+              textTransform: 'none',
+              fontSize: '16px',
+              fontWeight: '600',
+              px: 3,
+              py: 1,
+              borderColor: '#1A2B47',
+              color: '#1A2B47',
+              '&:hover': {
+                borderColor: '#0F1A2F',
+                backgroundColor: 'rgba(26, 43, 71, 0.1)',
+              },
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleConfirmSubmit}
+            disabled={isSubmitting}
+            startIcon={isSubmitting ? <CircularProgress size={18} color="inherit" /> : <CloudUpload />}
+            sx={{
+              textTransform: 'none',
+              fontSize: '16px',
+              fontWeight: '600',
+              px: 4,
+              py: 1,
+              backgroundColor: '#FFD700',
+              color: '#1A2B47',
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(255, 215, 0, 0.3)',
+              '&:hover': {
+                backgroundColor: '#E6C200',
+                boxShadow: '0 4px 8px rgba(255, 215, 0, 0.4)',
+              },
+              '&:disabled': {
+                backgroundColor: '#ccc',
+                boxShadow: 'none',
+              },
+            }}
+          >
+            {isSubmitting ? 'Submitting...' : 'Yes, Submit to Database'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+
       {/* Actions */}
       <DialogActions
         sx={{
@@ -488,7 +747,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
           Exit
         </Button>
         
-        <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           <Button
             variant="outlined"
             startIcon={<Add />}
@@ -561,6 +820,7 @@ const ExhibitCreatorModal = ({ open, onClose, mainDocument }) => {
           >
             View Exhibit
           </Button>
+          
         </Box>
       </DialogActions>
     </Dialog>
