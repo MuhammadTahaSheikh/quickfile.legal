@@ -125,7 +125,7 @@ const Profile = () => {
             My <Box component="span" sx={{ color: '#FFD700' }}>Profile</Box>
           </Typography>
           <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-            Manage your account information and preferences
+            Manage your account information and preference
           </Typography>
         </Box>
 
